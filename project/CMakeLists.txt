@@ -51,6 +51,7 @@ set(src_files
         "./lib/matrix/Transformer.cpp"
         "./lib/matrix/errors/errors.cpp"
         "./lib/matrix/matrix/BaseMatrix.cpp"
+        "./lib/matrix/matrix/Matrix.hpp"
         "./lib/objects/BaseObject.cpp"
         "./lib/objects/Composite.cpp"
         "./lib/objects/invisibleobject/Camera.cpp"

@@ -59,5 +59,5 @@ public:
     };
 };
 
-#include "matrix.hpp"
+#include "Matrix.hpp"
 
