@@ -65,6 +65,7 @@ set(src_files
         "./lib/scene/Scene.cpp"
         "./src/main.cpp"
         "./src/mainwindow.cpp"
+        "./src/Solver.cpp"
 )
 
 add_executable(project

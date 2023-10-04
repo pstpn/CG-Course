@@ -14,6 +14,8 @@
 #include "QtFactory.h"
 #include "Facade.h"
 
+#include "Solver.h"
+
 namespace Ui
 {
     class MainWindow;
@@ -83,4 +85,6 @@ private:
     std::vector<std::size_t> _cameras;
     std::size_t _cameraIndex = 0;
     std::size_t _modelIndex = 0;
+
+    std::shared_ptr<Solver> _solver;
 };

@@ -33,6 +33,8 @@ void MainWindow::setupScene() {
 
     auto solution(new DrawerSolution<QtFactory, QGraphicsScene>());
     _drawer = solution->createDrawer(_scene.get());
+
+    _solver = std::shared_ptr<Solver>(new Solver(1000, 1000, 1000, 1.));
 }
 
 void MainWindow::updateScene() {
@@ -45,6 +47,10 @@ void MainWindow::updateScene() {
 
     DrawScene draw_cmd(scene, _drawer);
     _facade->execute(draw_cmd);
+
+    _solver->solve();
+    double *** pressure = _solver.getPressure();
+    // TODO
 }
 
 void MainWindow::checkCamExist() {
