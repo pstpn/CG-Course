@@ -34,7 +34,9 @@ void MainWindow::setupScene() {
     auto solution(new DrawerSolution<QtFactory, QGraphicsScene>());
     _drawer = solution->createDrawer(_scene.get());
 
-    _solver = std::shared_ptr<Solver>(new Solver(1000, 1000, 1000, 1.));
+    _solver = std::shared_ptr<Solver>(new Solver(1.));
+    _solver->addWaveSource({0, 0, 0, 10});
+    _solver->addObstacle({-100, 100, -100, 100, -100, 100});
 }
 
 void MainWindow::updateScene() {
@@ -49,8 +51,42 @@ void MainWindow::updateScene() {
     _facade->execute(draw_cmd);
 
     _solver->solve();
-    double *** pressure = _solver.getPressure();
-    // TODO
+
+    std::shared_ptr<Camera> camera(_facade->getSceneManager()->getCamera());
+    if(!camera)
+        return;
+
+    QGraphicsScene *_drawingScene = std::reinterpret_pointer_cast<QtDrawer>(_drawer)->getScene();
+
+    std::vector<Wave> _waves = _solver->getWaves();
+
+    Transformer transformer;
+    transformer.setRotationMatrix(
+        camera->_angle.getX(),
+        camera->_angle.getY(),
+        camera->_angle.getZ()
+    );
+
+    std::vector<Vertex> projections;
+    for(auto &wave : _waves) {
+        for(auto &vert : wave.points) {
+            Vertex tmp = vert;
+            transformer.transform(tmp);
+            projections.push_back(tmp + camera->_location);
+        }
+        for(auto &triag : wave.triangles) {
+            auto dd = (camera->_location - wave.points[std::get<0>(triag)]);
+            double distToCamera = dd.dotProduct(dd, dd);
+            QPolygonF triangle;
+            triangle << QPoint(projections[std::get<0>(triag)].getX(), projections[std::get<0>(triag)].getY())
+                    << QPoint(projections[std::get<1>(triag)].getX(), projections[std::get<1>(triag)].getY())
+                    << QPoint(projections[std::get<2>(triag)].getX(), projections[std::get<2>(triag)].getY());
+            _drawingScene->addPolygon(triangle, QPen(QColor(0, 0, 0, 100)), QBrush(QColor(0, 0, 0, 60)));
+        }
+    }
+    // Vertex projection = point;
+    // transfomer.transform(projection);
+    // return projection + _camera->_location;
 }
 
 void MainWindow::checkCamExist() {

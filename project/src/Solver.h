@@ -22,31 +22,46 @@
 
 #include <vector>
 #include <memory>
+#include "Vertex.h"
+#include <tuple>
+#include <cmath> // TODO хз можно ли использовать cmath по стандартам 
 
 struct WaveSource
 {
   double x, y, z, nu;
 };
 
-struct Obstacle
+struct Obstacle // TODO вообще говоря не сильно сложно сделать произвольные обьекты 
 {
   double x1, x2, y1, y2, z1, z2;
+};
+
+struct Wave
+{
+  std::vector<Vertex> points;
+  std::vector<Vertex> velocities;
+  std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
 };
 
 class Solver
 {
   private:
-    double lx, ly, lz, a; // params of the PDE
-    double dx, dy, dz; // params
+    double velocity;
+    
     std::vector<WaveSource> _sources;
     std::vector<Obstacle> _obstacles;
     
-    // TODO make shared_ptr:
-    double *** _prevPressure;
-    double *** _pressure;
+    std::vector<Wave> _waves;
+
+    void generateWave(double x, double y, double z);
 
   public:
-    explicit Solver(double _lx, double _ly, double _lz, double _a, double _dx = 0.1, double _dy = 0.1, double _dz = 0.1);
-    void solve(double dt = 0.1);
-    double ***getPressure() const;
+    explicit Solver(double _a);
+    void solve(double dt = 0.001);
+    
+    void addWaveSource(const WaveSource &tmp);
+    void addObstacle(const Obstacle &tmp);
+
+
+    std::vector<Wave> &getWaves();
 };

@@ -21,3 +21,8 @@ void QtDrawer::clearScene()
 {
     _scene->clear();
 }
+
+QGraphicsScene *QtDrawer::getScene()
+{
+    return _scene;
+}

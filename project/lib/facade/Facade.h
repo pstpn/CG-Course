@@ -21,6 +21,11 @@ public:
     ~Facade() = default;
 
     void execute(BaseAction &command);
+
+    // TODO убрать:
+    std::shared_ptr<SceneManager> getSceneManager() {
+        return _sceneManager;
+    }
 private:
     std::shared_ptr<DrawManager> _drawManager;
     std::shared_ptr<LoadManager> _loadManager;

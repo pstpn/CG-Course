@@ -1,30 +1,79 @@
 #include "Solver.h"
 
-Solver::Solver(double _lx, double _ly, double _lz, double _a, double _dx, double _dy, double _dz)
-  : lx(_lx), ly(_ly), lz(_lz), a(_a), dx(_dx), dy(_dy), dz(_dz)
+void Solver::generateWave(double x_center, double y_center, double z_center)
 {
-  _sources.push_back(WaveSource{0, 0, 0});
-  _obstacles.push_back(Obstacle{-lx/2., lx/2., -ly/2., ly/2., 0, lz});
+  int sectorCount = 10;
+  int stackCount = 10;
+  float radius = 100.0f;
+  float sectorStep = 2 * M_PI / sectorCount;
+  float stackStep = M_PI / stackCount;
 
-  uint32_t Nx = lx / dx, Ny = ly / dy, Nz = lz / dz;
+  std::vector<Vertex> points;
+  std::vector<Vertex> velocities;
+  std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
 
-  _prevPressure = new double**[Nx];
-  // _pressure = std::make_shared<double ***>(new double**[Nx]);
+  for (int i = 0; i <= stackCount; ++i) {
+      float stackAngle = M_PI / 2 - i * stackStep;
+      float xy = radius * std::cos(stackAngle);
+      float z = radius * std::sin(stackAngle);
 
-  for(uint32_t x = 0; x < Nx; x++) {
-    _prevPressure[x] = new double*[Ny];
-    for(uint32_t y = 0; y < Ny; y++) {
-      _prevPressure[x][y] = new double[Nz];
-    }
+      for (int j = 0; j <= sectorCount; ++j) {
+          float sectorAngle = j * sectorStep;
+          float x = xy * std::cos(sectorAngle);
+          float y = xy * std::sin(sectorAngle);
+
+          points.push_back({x + x_center, y + y_center, z + z_center});
+          velocities.push_back({x, y, z});
+      }
   }
+
+  for (int i = 0; i < stackCount; ++i) {
+      int k1 = i * (sectorCount + 1);
+      int k2 = k1 + sectorCount + 1;
+
+      for (int j = 0; j < sectorCount; ++j, ++k1, ++k2) {
+          if (i != 0) {
+              triangles.push_back({k1, k2, k1 + 1});
+          }
+
+          if (i != stackCount - 1) {
+              triangles.push_back({k1 + 1, k2, k2 + 1});
+          }
+      }
+  }
+
+  _waves.push_back(Wave{
+    points, velocities, triangles
+  });
 }
+
+Solver::Solver(double _a)
+{}
 
 void Solver::solve(double dt)
 {
   // TODO
+  if(_waves.size() == 0)
+    for(auto &source : _sources) {
+      generateWave(source.x, source.y, source.z);
+    }
+  for(auto &wave : _waves)
+    for(uint32_t index=0; index<wave.points.size(); ++index) {
+      wave.points[index] += wave.velocities[index] * dt;
+    }
 }
- 
-double *** Solver::getPressure() const
+
+void Solver::addWaveSource(const WaveSource &tmp)
 {
-  return _pressure;
+  _sources.push_back(tmp);
+}
+
+void Solver::addObstacle(const Obstacle &tmp)
+{
+  _obstacles.push_back(tmp);
+}
+
+std::vector<Wave> &Solver::getWaves()
+{
+    return _waves;
 }
