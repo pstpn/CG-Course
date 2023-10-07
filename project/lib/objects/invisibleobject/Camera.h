@@ -20,7 +20,7 @@ public:
     
     void rotate(const Vertex &angles);
 
-public: // TODO АХАХАХ это мем
+public: // TODO: fix
     Vertex _location;
     Vertex _angle;
 };

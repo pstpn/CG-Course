@@ -2,8 +2,8 @@
 
 void Solver::generateWave(double x_center, double y_center, double z_center)
 {
-  int sectorCount = 10;
-  int stackCount = 10;
+  int sectorCount = 100;
+  int stackCount = 100;
   float radius = 100.0f;
   float sectorStep = 2 * M_PI / sectorCount;
   float stackStep = M_PI / stackCount;

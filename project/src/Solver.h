@@ -24,14 +24,14 @@
 #include <memory>
 #include "Vertex.h"
 #include <tuple>
-#include <cmath> // TODO хз можно ли использовать cmath по стандартам 
+#include <cmath>
 
 struct WaveSource
 {
   double x, y, z, nu;
 };
 
-struct Obstacle // TODO вообще говоря не сильно сложно сделать произвольные обьекты 
+struct Obstacle // TODO подумать над произвольными объектами
 {
   double x1, x2, y1, y2, z1, z2;
 };
