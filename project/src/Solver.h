@@ -26,6 +26,11 @@
 #include <tuple>
 #include <cmath>
 
+struct Point {
+    double x, y, z;
+    double vx, vy, vz;
+};
+
 struct WaveSource
 {
   double x, y, z, nu;
@@ -38,8 +43,7 @@ struct Obstacle // TODO подумать над произвольными об�
 
 struct Wave
 {
-  std::vector<Vertex> points;
-  std::vector<Vertex> velocities;
+  std::vector<Point> points;
   std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
 };
 
@@ -49,6 +53,7 @@ class Solver
     double velocity;
     
     std::vector<WaveSource> _sources;
+    Obstacle room;
     std::vector<Obstacle> _obstacles;
     
     std::vector<Wave> _waves;
@@ -61,7 +66,7 @@ class Solver
     
     void addWaveSource(const WaveSource &tmp);
     void addObstacle(const Obstacle &tmp);
-
+    void setRoom(const Obstacle &tmp);
 
     std::vector<Wave> &getWaves();
 };

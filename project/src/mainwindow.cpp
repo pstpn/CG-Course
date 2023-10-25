@@ -70,18 +70,21 @@ void MainWindow::updateScene() {
     std::vector<Vertex> projections;
     for(auto &wave : _waves) {
         for(auto &vert : wave.points) {
-            Vertex tmp = vert;
+            Vertex tmp = {vert.x, vert.y, vert.z};
             transformer.transform(tmp);
             projections.push_back(tmp + camera->_location);
         }
         for(auto &triag : wave.triangles) {
-            auto dd = (camera->_location - wave.points[std::get<0>(triag)]);
+            auto dd = (camera->_location -
+                     Vertex(wave.points[std::get<0>(triag)].x,
+                            wave.points[std::get<0>(triag)].y,
+                            wave.points[std::get<0>(triag)].z));
             double distToCamera = dd.dotProduct(dd, dd);
             QPolygonF triangle;
             triangle << QPoint(projections[std::get<0>(triag)].getX(), projections[std::get<0>(triag)].getY())
                     << QPoint(projections[std::get<1>(triag)].getX(), projections[std::get<1>(triag)].getY())
                     << QPoint(projections[std::get<2>(triag)].getX(), projections[std::get<2>(triag)].getY());
-            _drawingScene->addPolygon(triangle, QPen(QColor(0, 0, 0, 100)), QBrush(QColor(0, 0, 0, 60)));
+            _drawingScene->addPolygon(triangle, QPen(QColor(0, 0, 0, 60)), QBrush(QColor(0, 0, 0, 40)));
         }
     }
     // Vertex projection = point;
