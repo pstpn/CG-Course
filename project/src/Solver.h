@@ -30,7 +30,7 @@ struct Point {
     double x, y, z;
     double vx, vy, vz;
 
-    uint32_t collision_count;
+    uint32_t collision_count = 0;
 };
 
 struct WaveSource
@@ -66,7 +66,7 @@ class Solver
 
   public:
     explicit Solver();
-    void solve(double dt = 0.001);
+    void solve(double dt = 0.002);
     
     void addWaveSource(const WaveSource &tmp);
     void addObstacle(const Obstacle &tmp);

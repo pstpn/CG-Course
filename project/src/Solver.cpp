@@ -49,8 +49,8 @@ void handleCollisionWithRoom(Point& point, const Obstacle& room) {
 
 void Solver::generateWave(double x_center, double y_center, double z_center)
 {
-  int sectorCount = 10;
-  int stackCount = 10;
+  int sectorCount = 20;
+  int stackCount = 20;
   float radius = 0.1f;
   float sectorStep = 2 * M_PI / sectorCount;
   float stackStep = M_PI / stackCount;
@@ -102,7 +102,9 @@ Solver::Solver()
 
 void Solver::solve(double dt)
 {
-  const double wave_lifetime = 1.f;
+  const double wave_lifetime = 0.25f;
+
+  global_time += dt;
 
   // TODO
   // if(_waves.size() == 0)
@@ -111,18 +113,18 @@ void Solver::solve(double dt)
       generateWave(source.x, source.y, source.z);
       _waves[_waves.size() - 1].spawn_time = global_time;
       source.last_wave_time = global_time;
+
+      std::cout << "New wave spawned:" << global_time << std::endl;
     }
   }
 
   for (auto it = _waves.begin(); it != _waves.end(); ) {
-        if (it->spawn_time < global_time - wave_lifetime) {
-            // Erase the element and update the iterator
-            it = _waves.erase(it);
-        } else {
-            // Move to the next element
-            ++it;
-        }
-    }
+    if (it->spawn_time < global_time - wave_lifetime) {
+      it = _waves.erase(it);
+      std::cout << "Wave removed:" << global_time << std::endl;
+    } else
+      ++it;
+  }
 
   for(auto &wave : _waves) {
     for(auto &point : wave.points) {
@@ -149,8 +151,6 @@ void Solver::solve(double dt)
       }
     }
   }
-  
-  global_time += dt;
 }
 
 void Solver::addWaveSource(const WaveSource &tmp)

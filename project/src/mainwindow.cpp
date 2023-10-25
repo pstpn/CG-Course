@@ -36,7 +36,7 @@ void MainWindow::setupScene() {
 
     _solver = std::shared_ptr<Solver>(new Solver());
     _solver->addWaveSource({0, 0, 0, 10});
-    _solver->addObstacle({-100, 100, -100, 100, -100, 100});
+    _solver->setRoom({-100, 100, -100, 100, -100, 100});
 }
 
 void MainWindow::updateScene() {
@@ -67,8 +67,8 @@ void MainWindow::updateScene() {
         camera->_angle.getZ()
     );
 
-    std::vector<Vertex> projections;
     for(auto &wave : _waves) {
+        std::vector<Vertex> projections;
         for(auto &vert : wave.points) {
             Vertex tmp = {vert.x, vert.y, vert.z};
             transformer.transform(tmp);
@@ -84,9 +84,12 @@ void MainWindow::updateScene() {
             uint32_t triangle_alpha = 40 - 
                 ( wave.points[std::get<0>(triag)].collision_count
                 + wave.points[std::get<1>(triag)].collision_count
-                + wave.points[std::get<2>(triag)].collision_count) * 10;
-            if(triangle_alpha < 0)
+                + wave.points[std::get<2>(triag)].collision_count ) * 9;
+            if(triangle_alpha < 1)
                 continue;
+
+            // if(triangle_alpha != 80)
+            //     std::cout << triangle_alpha << std::endl;
             
             QPolygonF triangle;
             triangle << QPoint(projections[std::get<0>(triag)].getX(),
@@ -96,7 +99,7 @@ void MainWindow::updateScene() {
                     << QPoint(projections[std::get<2>(triag)].getX(),
                             projections[std::get<2>(triag)].getY());
             _drawingScene->addPolygon(triangle,
-                        QPen(QColor(0, 0, 0, 60)),
+                        QPen(QColor(0, 0, 0, 10)),
                         QBrush(QColor(0, 0, 0, triangle_alpha)));
         }
     }
