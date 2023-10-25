@@ -29,11 +29,14 @@
 struct Point {
     double x, y, z;
     double vx, vy, vz;
+
+    uint32_t collision_count;
 };
 
 struct WaveSource
 {
   double x, y, z, nu;
+  double last_wave_time;
 };
 
 struct Obstacle // TODO подумать над произвольными объектами
@@ -45,12 +48,13 @@ struct Wave
 {
   std::vector<Point> points;
   std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
+  double spawn_time;
 };
 
 class Solver
 {
   private:
-    double velocity;
+    double global_time;
     
     std::vector<WaveSource> _sources;
     Obstacle room;
@@ -61,7 +65,7 @@ class Solver
     void generateWave(double x, double y, double z);
 
   public:
-    explicit Solver(double _a);
+    explicit Solver();
     void solve(double dt = 0.001);
     
     void addWaveSource(const WaveSource &tmp);

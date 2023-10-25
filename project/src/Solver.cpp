@@ -96,17 +96,35 @@ void Solver::generateWave(double x_center, double y_center, double z_center)
   });
 }
 
-Solver::Solver(double _a)
+Solver::Solver()
+  : global_time(0)
 {}
 
 void Solver::solve(double dt)
 {
+  const double wave_lifetime = 1.f;
+
   // TODO
-  if(_waves.size() == 0)
-    for(auto &source : _sources) {
+  // if(_waves.size() == 0)
+  for(auto &source : _sources) {
+    if(!source.last_wave_time or source.last_wave_time < global_time - 1.f / source.nu) {
       generateWave(source.x, source.y, source.z);
+      _waves[_waves.size() - 1].spawn_time = global_time;
+      source.last_wave_time = global_time;
     }
-  for(auto &wave : _waves)
+  }
+
+  for (auto it = _waves.begin(); it != _waves.end(); ) {
+        if (it->spawn_time < global_time - wave_lifetime) {
+            // Erase the element and update the iterator
+            it = _waves.erase(it);
+        } else {
+            // Move to the next element
+            ++it;
+        }
+    }
+
+  for(auto &wave : _waves) {
     for(auto &point : wave.points) {
       point.x += point.vx * dt;
       point.y += point.vy * dt;
@@ -126,8 +144,13 @@ void Solver::solve(double dt)
 
       if (!collided) {
         handleCollisionWithRoom(point, room);
+      } else {
+        point.collision_count ++;
       }
     }
+  }
+  
+  global_time += dt;
 }
 
 void Solver::addWaveSource(const WaveSource &tmp)
