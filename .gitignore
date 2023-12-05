@@ -34,3 +34,7 @@
 .idea
 .vscode
 build
+glfw-3.3.8
+x64
+assimp
+.vs
