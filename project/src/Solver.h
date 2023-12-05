@@ -26,9 +26,17 @@
 #include <tuple>
 #include <cmath>
 
+struct Point {
+    double x, y, z;
+    double vx, vy, vz;
+
+    uint32_t collision_count = 0;
+};
+
 struct WaveSource
 {
   double x, y, z, nu;
+  double last_wave_time;
 };
 
 struct Obstacle // TODO подумать над произвольными объектами
@@ -38,17 +46,18 @@ struct Obstacle // TODO подумать над произвольными об�
 
 struct Wave
 {
-  std::vector<Vertex> points;
-  std::vector<Vertex> velocities;
+  std::vector<Point> points;
   std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> triangles;
+  double spawn_time;
 };
 
 class Solver
 {
   private:
-    double velocity;
+    double global_time;
     
     std::vector<WaveSource> _sources;
+    Obstacle room;
     std::vector<Obstacle> _obstacles;
     
     std::vector<Wave> _waves;
@@ -56,12 +65,12 @@ class Solver
     void generateWave(double x, double y, double z);
 
   public:
-    explicit Solver(double _a);
-    void solve(double dt = 0.001);
+    explicit Solver();
+    void solve(double dt = 0.002);
     
     void addWaveSource(const WaveSource &tmp);
     void addObstacle(const Obstacle &tmp);
-
+    void setRoom(const Obstacle &tmp);
 
     std::vector<Wave> &getWaves();
 };
