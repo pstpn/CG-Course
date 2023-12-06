@@ -141,13 +141,13 @@ int main()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
 
-    Model model("icosphere_2.obj");
-    Model teapot("teapot.obj");
+    Model sphere("models/icosphere_2.obj");
+    Model room("models/room.obj");
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
     // Event loop
     while (!glfwWindowShouldClose(window))
@@ -162,27 +162,24 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shaders.use();
-        shaders.setFloat("u_time", glfwGetTime());
         glm::mat4 proj = glm::perspective(glm::radians(fov), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         shaders.setMat4("proj", proj);
-
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         shaders.setMat4("view", view);
 
-        //shaders.setVec4("figureColor", glm::vec4(0.5, 0.6, 0.7, 1));
-        //glm::mat4 m = glm::mat4(1.0f);
-        //m = glm::translate(m, glm::vec3(3, 0, 0));
-        //m = glm::scale(m, glm::vec3(0.6, 0.6, 0.6));
-        //shaders.setMat4("model", m);
-        //teapot.Draw(shaders);
-
+        shaders.setFloat("u_time", 0);
+        //shaders.setVec4("figureColor", glm::vec4(1, 1, 1, 0.5));
         glm::mat4 m = glm::mat4(1.0f);
-        m = glm::scale(m, glm::vec3(0.2, 0.2, 0.2));
         shaders.setMat4("model", m);
 
-        shaders.setVec4("figureColor", glm::vec4(0.4, 0.5, 0.6, 1));
+        room.Draw(shaders);
 
-        model.Draw(shaders);
+        m = glm::scale(m, glm::vec3(0.2, 0.2, 0.2));
+        shaders.setFloat("u_time", glfwGetTime());
+        shaders.setMat4("model", m);
+        //shaders.setVec4("figureColor", glm::vec4(0.4, 0.5, 0.6, 0.25));
+
+        sphere.Draw(shaders);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
