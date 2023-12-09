@@ -2,10 +2,10 @@
 
 out vec4 FragColor;
 
-in vec3 Normal;
-in vec4 FragPos;
+//in vec3 Normal;
+//in vec4 FragPos;
 
-in vec4 figureColor;
+//in vec4 figureColor;
 
 void main()
 {
@@ -14,5 +14,5 @@ void main()
 	//float opacity = figureColor.w;
 	//FragColor = vec4(figureColor.xyz * k, opacity);
 
-	FragColor = figureColor;
+	FragColor = vec4(0, 0, 0, 0.4);
 }

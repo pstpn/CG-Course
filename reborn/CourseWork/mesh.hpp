@@ -1,6 +1,8 @@
 #include "shader.hpp"
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 
 
 struct Vertex {
@@ -14,7 +16,10 @@ public:
     std::vector<unsigned int> indices;
 
     Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+
+    void Bind();
     void Draw(Shader& shader);
+    void Unbind();
 private:
     unsigned int VAO, VBO, EBO;
 
