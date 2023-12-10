@@ -1,4 +1,5 @@
 #include "shader.hpp"
+#include "scene.hpp"
 #include "model.hpp"
 
 #include "imgui.h"
@@ -88,14 +89,21 @@ int main()
     // Create shaders
     Shader shaders("shaders/shader.vert", "shaders/shader.frag");
 
+    // Create scene
+    Scene scene;
+
     Model sphere("models/icosphere.obj");
-    Model room("models/room.obj");
+    Model room("models/cube.obj");
+    scene.addObject(room);
+
+    Model cube("models/cube.obj");
+    sphere.addObject(cube);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_FRONT);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
@@ -134,16 +142,24 @@ int main()
         glm::mat4 view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
         shaders.setMat4("view", view);
 
-        //shaders.setVec4("figureColor", glm::vec4(1, 1, 1, 0.5));
+        shaders.setVec4("figureColor", glm::vec4(0, 0, 0, 0.4));
         glm::mat4 m = glm::mat4(1.0f);
         shaders.setMat4("model", m);
 
-        room.Draw(shaders);
+        //room.Draw(shaders);
+
+        m = glm::scale(m, glm::vec3(0.2, 0.2, 0.2));
+        m = glm::rotate(m, glm::radians(20.0f), glm::vec3(0, 1, 0));
+        shaders.setMat4("model", m);
+        shaders.setVec4("figureColor", glm::vec4(0.3, 0.3, 0.3, 1));
+
+        cube.Draw(shaders);
 
         float u_time = glfwGetTime();
-        m = glm::scale(m, glm::vec3(0.2, 0.2, 0.2));
-        m = glm::translate(m, glm::vec3(2, 2, -2));
+        m = glm::rotate(m, glm::radians(-20.0f), glm::vec3(0, 1, 0));
+        m = glm::translate(m, glm::vec3(0, 0, -2.5));
         shaders.setMat4("model", m);
+        shaders.setVec4("figureColor", glm::vec4(0.3, 0.4, 0.5, 0.4));
 
         sphere.Draw(shaders, true);
 
@@ -168,7 +184,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float cameraSpeed = static_cast<float>(10 * deltaTime);
+    float cameraSpeed = static_cast<float>(5 * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "shader.hpp"
 
 #include <glm/glm.hpp>
@@ -5,9 +7,16 @@
 #include <GLFW/glfw3.h>
 
 
-struct Vertex {
+struct Vertex 
+{
     glm::vec3 Position;
     glm::vec3 Velocity;
+};
+
+struct Face
+{
+    std::pair<glm::uvec3, glm::uvec3> Triangles;
+    glm::vec3 Normal;
 };
 
 class Mesh {

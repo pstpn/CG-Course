@@ -1,3 +1,5 @@
+#pragma once
+
 #include "shader.hpp"
 #include "mesh.hpp"
 
@@ -11,7 +13,16 @@ class Model
 public:
     size_t vertexCount;
     std::vector<Vertex>       vertices;
+    std::vector<Face>         faces;
     std::vector<unsigned int> indices;
+    std::vector<Model> objects;
+    std::vector<std::pair<bool, std::vector<float>>> prevNormalDots;
+
+    void addObject(const Model& obj)
+    {
+        objects.push_back(obj);
+        prevNormalDots.push_back(std::pair<bool, std::vector<float>>(false, std::vector<float>(6)));
+    }
 
     Model(const char* path)
     {

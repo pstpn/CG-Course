@@ -109,5 +109,8 @@
     <ClInclude Include="imgui\imgui_impl_opengl3_loader.h">
       <Filter>Файлы заголовков\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="scene.hpp">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
