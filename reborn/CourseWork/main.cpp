@@ -15,6 +15,7 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void processInput(GLFWwindow* window);
 
 // camera
@@ -44,6 +45,40 @@ const unsigned int SCR_WIDTH = 900;
  * \brief Window height
  */
 const unsigned int SCR_HEIGHT = 900;
+
+//ImGui::Begin("Objects");
+////ImGui::SliderFloat("Angle X", &angle[0], 0.0f, 360.0f);
+////ImGui::SliderFloat("Angle Y", &angle[1], 0.0f, 360.0f);
+////ImGui::SliderFloat("Angle Z", &angle[2], 0.0f, 360.0f);
+////ImGui::SliderFloat("Light X", &lightPos.x, -5.0f, 5.0f);
+//ImGui::SliderFloat("Light Power", &lightPos.y, -20.0f, 105.0f);
+////ImGui::SliderFloat("Light Z", &lightPos.z, -5.0f, 5.0f);
+//bool change = nigmode;
+//ImGui::Checkbox("Nigmode", &nigmode);
+//change = nigmode != change;
+//// if(change)
+//// {
+////     char str1[] = "./tex/container2.png";
+////     char str2[] = "./tex/prikol2.png";
+////     char *str = nigmode ? str2 : str1;
+////     data = stbi_load(str, &width, &height, &nrChannels, 0);
+////     glGenTextures(1, &texture3);
+////     glBindTexture(GL_TEXTURE_2D, texture3);
+////     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+////     stbi_image_free(data);
+////     glGenerateMipmap(GL_TEXTURE_2D);
+////     glBindTexture(GL_TEXTURE_2D, texture3);   
+//// }
+//
+//ImGui::End();
+//ImGui::Begin("Camera");
+//ImGui::SliderFloat("FoV", &fov, 0.0f, 180.0f);
+//ImGui::LabelText("Camera X", "%f", cam.pos.x);
+//ImGui::LabelText("Camera Y", "%f", cam.pos.y);
+//ImGui::LabelText("Camera Z", "%f", cam.pos.z);
+//
+//ImGui::End();
+
 
 int main()
 {
@@ -93,6 +128,7 @@ int main()
     Scene scene;
 
     Model sphere("models/icosphere.obj");
+    glm::vec3 sphereColor = glm::vec3(0.0f);
     Model room("models/cube.obj");
     scene.addObject(room);
 
@@ -107,6 +143,7 @@ int main()
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -119,12 +156,10 @@ int main()
 
         if (showWindow)
         {
-            //ImGui::Begin("Another Window", &showWindow);
-            //ImGui::Text("Hello from another window!");
-            //if (ImGui::Button("Close Me"))
-            //    showWindow = false;
-            //ImGui::End();
-            ImGui::ShowDemoWindow(&showWindow);
+            ImGui::Begin("Menu", &showWindow);
+            //ImGui::Text("!");
+            ImGui::SliderFloat3("Sphere color (R, G, B)", (float *)(&sphereColor), 0.0f, 1.0f);
+            ImGui::End();
         }
 
         float currentFrame = static_cast<float>(glfwGetTime());
@@ -159,7 +194,7 @@ int main()
         m = glm::rotate(m, glm::radians(-20.0f), glm::vec3(0, 1, 0));
         m = glm::translate(m, glm::vec3(0, 0, -2.5));
         shaders.setMat4("model", m);
-        shaders.setVec4("figureColor", glm::vec4(0.3, 0.4, 0.5, 0.4));
+        shaders.setVec4("figureColor", glm::vec4(sphereColor, 0.4));
 
         sphere.Draw(shaders, true);
 
@@ -184,7 +219,7 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
-    float cameraSpeed = static_cast<float>(5 * deltaTime);
+    float cameraSpeed = static_cast<float>(3 * deltaTime);
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
         cameraPos += cameraSpeed * cameraFront;
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -235,4 +270,24 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
     front.y = sin(glm::radians(pitch));
     front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
     cameraFront = glm::normalize(front);
+}
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS)
+    {
+        int mouse_enabled = glfwGetInputMode(window, GLFW_CURSOR);
+
+        if (mouse_enabled == GLFW_CURSOR_NORMAL)
+        {
+            glfwSetCursorPosCallback(window, mouse_callback);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        }
+        else
+        {
+            glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+            glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
+        }
+    }
 }
