@@ -50,19 +50,22 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
     for (i = 0; i < mesh->mNumVertices; ++i)
     {
         Vertex vertex;
-        glm::vec3 pos, velocity; 
+        glm::vec3 pos, normal, velocity; 
 
         pos.x = mesh->mVertices[i].x;
         pos.y = mesh->mVertices[i].y;
         pos.z = mesh->mVertices[i].z;
 
-        velocity.x = mesh->mNormals[i].x / 19000;
-        velocity.y = mesh->mNormals[i].y / 19000;
-        velocity.z = mesh->mNormals[i].z / 19000;
+        normal.x = mesh->mNormals[i].x;
+        normal.y = mesh->mNormals[i].y;
+        normal.z = mesh->mNormals[i].z;
 
-        //std::cout << mesh->mNormals[i].x << mesh->mNormals[i].y << mesh->mNormals[i].z << std::endl;
+        velocity.x = mesh->mNormals[i].x / 1900;
+        velocity.y = mesh->mNormals[i].y / 1900;
+        velocity.z = mesh->mNormals[i].z / 1900;
 
         vertex.Position = pos;
+        vertex.Normal = normal;
         vertex.Velocity = velocity;
 
         vertices.push_back(vertex);
@@ -146,12 +149,10 @@ glm::vec3 Model::getNormal(glm::vec3& point)
 
 void Model::updateVelocity()
 {
-    glm::mat4 mm = glm::scale(glm::mat4(1.0f), glm::vec3(0.2, 0.2, 0.2));
-    mm = glm::translate(mm, glm::vec3(0, 0, -2.5));
+    glm::mat4 mm = glm::translate(glm::mat4(1), glm::vec3(0, 0, -6.5));
     Vertex* pData = (Vertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
-    glm::mat4 m = glm::scale(glm::mat4(1.0f), glm::vec3(0.2, 0.2, 0.2));
-    m = glm::rotate(m, glm::radians(20.0f), glm::vec3(0, 1, 0));
+    glm::mat4 m = glm::rotate(glm::mat4(1), glm::radians(20.0f), glm::vec3(0, 1, 0));
 
     float glTime = glfwGetTime();
 

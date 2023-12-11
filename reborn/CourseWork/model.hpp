@@ -32,8 +32,8 @@ public:
     void updateVelocity();
 private:
     glm::vec4
-        maxRoomVert = glm::mat4(1.0f) * glm::vec4(1, 1, 1, 1),
-        minRoomVert = glm::mat4(1.0f) * glm::vec4(-1, -1, -1, 1);
+        maxRoomVert = glm::mat4(1.0f) * (glm::vec4(1, 1, 1, 1) * 10.0f),
+        minRoomVert = glm::mat4(1.0f) * (glm::vec4(-1, -1, -1, 1) * 10.0f);
 
     std::vector<Mesh> meshes;
     std::string directory;
