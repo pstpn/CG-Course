@@ -42,7 +42,7 @@ float lastFrame = 0.0f;
 bool showWindow = true;
 
 // lighting
-glm::vec3 lightPos(50, 50, 50);
+glm::vec3 lightPos(10, 5, 10);
 
 
 int main()
@@ -96,7 +96,7 @@ int main()
     // Create scene
     Scene scene;
 
-    Model sphere("models/icosphere.obj");
+    Model sphere("models/icosphere_2.obj");
 
     Model room("models/cube.obj");
     scene.addObject(room);
@@ -106,9 +106,9 @@ int main()
     sphere.addObject(cube);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_CULL_FACE);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
@@ -136,7 +136,7 @@ int main()
         glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glCullFace(GL_FRONT);
+        //glCullFace(GL_FRONT);
 
         shader.use();
         shader.setVec4("modelColor", glm::vec4(1.0f, 0.5f, 0.31f, 0.3f));
@@ -154,7 +154,7 @@ int main()
 
         room.Draw(shader);
 
-        glCullFace(GL_BACK);
+        //glCullFace(GL_BACK);
 
         m = glm::rotate(glm::mat4(1), glm::radians(20.0f), glm::vec3(0, 1, 0));
         shader.setMat4("model", m);
@@ -163,13 +163,13 @@ int main()
 
         cube.Draw(shader);
 
-        glCullFace(GL_FRONT);
+        //glCullFace(GL_FRONT);
 
         m = glm::mat4(1);
         m = glm::translate(m, glm::vec3(0, 0, -6.5));
         shader.setMat4("model", m);
-        shader.setVec4("modelColor", glm::vec4(0, 0, 0, 0.5));
-        shader.setVec3("lightColor", glm::vec3(0.0f, 0.0f, 0.0f));
+        shader.setVec4("modelColor", glm::vec4(0.4, 0.5, 0.6, 1));
+        shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
 
         sphere.Draw(shader, true);
 

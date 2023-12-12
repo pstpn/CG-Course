@@ -152,10 +152,10 @@ bool isIntersecting(const glm::vec3& orig,
       const glm::vec3& tri0,
       const glm::vec3& tri1,
       const glm::vec3& tri2) {
-    const float EPSILON = 1e-6f;
+    const float EPSILON = 1e-4f;
 
-    glm::vec3 edge1 = tri.v1 - tri.v0;
-    glm::vec3 edge2 = tri.v2 - tri.v0;
+    glm::vec3 edge1 = tri1 - tri0;
+    glm::vec3 edge2 = tri2 - tri0;
 
     glm::vec3 h = glm::cross(dir, edge2);
     float a = glm::dot(edge1, h);
@@ -164,7 +164,7 @@ bool isIntersecting(const glm::vec3& orig,
         return false; // The ray is parallel to the triangle
 
     float f = 1.0f / a;
-    glm::vec3 s = orig - tri.v0;
+    glm::vec3 s = orig - tri0;
     float u = f * glm::dot(s, h);
 
     if (u < 0.0f || u > 1.0f)
@@ -193,7 +193,7 @@ void Model::updateVelocity()
     for (size_t i = 0; i < vertexCount; ++i)
     {
         glm::vec3 curVel = vertices[i].Velocity;
-        glm::vec4 prevPos = mm * glm::vec4(vectives[i].Position, 1);
+        glm::vec4 prevPos = mm * glm::vec4(vertices[i].Position, 1);
         glm::vec4 tPos = glm::vec4(vertices[i].Position + curVel * glTime, 1);
         glm::vec4 point = mm * tPos;
 
@@ -230,25 +230,34 @@ void Model::updateVelocity()
                 if (pointPlane0 < 0 && pointPlane1 < 0 && pointPlane2 < 0 && pointPlane3 < 0 && pointPlane4 < 0 && pointPlane5 < 0)
                 {
                   glm::vec3 normal;
-                  bool found = False;
+                  bool found = false;
                   for(uint32_t i = 0; i < 6; ++i) {
-                    if(isIntercepting(
+                    if(isIntersecting(
                             glm::vec3(prevPos),
                             glm::vec3(point),
                             glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.x].Position, 1)),
                             glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.y].Position, 1)),
-                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.z].Position, 1))))
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.z].Position, 1))) || 
+                        isIntersecting(
+                            glm::vec3(prevPos),
+                            glm::vec3(point),
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.second.x].Position, 1)),
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.second.y].Position, 1)),
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.second.z].Position, 1))))
                     {
                       normal = objFaces[i].Normal;
+                      found = true;
                       break;
                     }
                   }
                   if(found) {
                     normal = glm::normalize(glm::vec3(m * glm::vec4(normal, 1)));
-                    float dotProduct = 2 * (curVel.x * normal.x + curVel.y * normal.y + curVel.z * normal.z);
+
+                    glm::vec3 vel = mm * glm::vec4(curVel, 1);
+
+                    float dotProduct = 2 * glm::dot(vel, normal);
                     curVel -= dotProduct * normal;
                   }
-
                 }
 
 
@@ -273,7 +282,7 @@ void Model::updateVelocity()
                 /*     else if (prevNormalDots[i].second[5] > 0) */
                 /*         normal = objFaces[5].Normal; */
      /* /1*               else */
-                /*         continue;*/ */
+                /*         continue;*/
 
                 /*     //normal = objFaces[0].Normal; */
                 /*     normal = glm::normalize(glm::vec3(m * glm::vec4(normal, 1))); */
