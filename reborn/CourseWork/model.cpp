@@ -147,6 +147,40 @@ glm::vec3 Model::getNormal(glm::vec3& point)
     return glm::vec3(0, 0, 0);
 }
 
+bool isIntersecting(const glm::vec3& orig,
+      const glm::vec3& dir,
+      const glm::vec3& tri0,
+      const glm::vec3& tri1,
+      const glm::vec3& tri2) {
+    const float EPSILON = 1e-6f;
+
+    glm::vec3 edge1 = tri.v1 - tri.v0;
+    glm::vec3 edge2 = tri.v2 - tri.v0;
+
+    glm::vec3 h = glm::cross(dir, edge2);
+    float a = glm::dot(edge1, h);
+
+    if (a > -EPSILON && a < EPSILON)
+        return false; // The ray is parallel to the triangle
+
+    float f = 1.0f / a;
+    glm::vec3 s = orig - tri.v0;
+    float u = f * glm::dot(s, h);
+
+    if (u < 0.0f || u > 1.0f)
+        return false;
+
+    glm::vec3 q = glm::cross(s, edge1);
+    float v = f * glm::dot(dir, q);
+
+    if (v < 0.0f || u + v > 1.0f)
+        return false;
+
+    float t = f * glm::dot(edge2, q);
+
+    return t > EPSILON;
+}
+
 void Model::updateVelocity()
 {
     glm::mat4 mm = glm::translate(glm::mat4(1), glm::vec3(0, 0, -6.5));
@@ -159,6 +193,7 @@ void Model::updateVelocity()
     for (size_t i = 0; i < vertexCount; ++i)
     {
         glm::vec3 curVel = vertices[i].Velocity;
+        glm::vec4 prevPos = mm * glm::vec4(vectives[i].Position, 1);
         glm::vec4 tPos = glm::vec4(vertices[i].Position + curVel * glTime, 1);
         glm::vec4 point = mm * tPos;
 
@@ -192,43 +227,68 @@ void Model::updateVelocity()
                 float pointPlane4 = glm::dot(pointToVertex4, glm::vec3(m * glm::vec4(objFaces[4].Normal, 1)));
                 float pointPlane5 = glm::dot(pointToVertex5, glm::vec3(m * glm::vec4(objFaces[5].Normal, 1)));
 
-                if (!prevNormalDots[i].first)
-                    prevNormalDots[i].first = true;
-                //else if (pointPlane0 < 0 || pointPlane1 < 0 || pointPlane2 < 0 || pointPlane3 < 0 || pointPlane4 < 0 || pointPlane5 < 0)
-                //    continue;
-                else if (pointPlane0 < 0 && pointPlane1 < 0 && pointPlane2 < 0 && pointPlane3 < 0 && pointPlane4 < 0 && pointPlane5 < 0)
+                if (pointPlane0 < 0 && pointPlane1 < 0 && pointPlane2 < 0 && pointPlane3 < 0 && pointPlane4 < 0 && pointPlane5 < 0)
                 {
-                    glm::vec3 normal;
-
-                    if (prevNormalDots[i].second[0] > 0)
-                        normal = objFaces[0].Normal;
-                    else if (prevNormalDots[i].second[1] > 0)
-                        normal = objFaces[1].Normal;
-                    else if (prevNormalDots[i].second[2] > 0)
-                        normal = objFaces[2].Normal;
-                    else if (prevNormalDots[i].second[3] > 0)
-                        normal = objFaces[3].Normal;
-                    else if (prevNormalDots[i].second[4] > 0)
-                        normal = objFaces[4].Normal;
-                    else if (prevNormalDots[i].second[5] > 0)
-                        normal = objFaces[5].Normal;
-     /*               else
-                        continue;*/
-
-                    //normal = objFaces[0].Normal;
+                  glm::vec3 normal;
+                  bool found = False;
+                  for(uint32_t i = 0; i < 6; ++i) {
+                    if(isIntercepting(
+                            glm::vec3(prevPos),
+                            glm::vec3(point),
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.x].Position, 1)),
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.y].Position, 1)),
+                            glm::vec3(m * glm::vec4(objVertices[objFaces[i].Triangles.first.z].Position, 1))))
+                    {
+                      normal = objFaces[i].Normal;
+                      break;
+                    }
+                  }
+                  if(found) {
                     normal = glm::normalize(glm::vec3(m * glm::vec4(normal, 1)));
-
                     float dotProduct = 2 * (curVel.x * normal.x + curVel.y * normal.y + curVel.z * normal.z);
-
                     curVel -= dotProduct * normal;
+                  }
+
                 }
 
-                prevNormalDots[i].second[0] = pointPlane0;
-                prevNormalDots[i].second[1] = pointPlane1;
-                prevNormalDots[i].second[2] = pointPlane2;
-                prevNormalDots[i].second[3] = pointPlane3;
-                prevNormalDots[i].second[4] = pointPlane4;
-                prevNormalDots[i].second[5] = pointPlane5;
+
+                /* if (!prevNormalDots[i].first) */
+                /*     prevNormalDots[i].first = true; */
+                /* //else if (pointPlane0 < 0 || pointPlane1 < 0 || pointPlane2 < 0 || pointPlane3 < 0 || pointPlane4 < 0 || pointPlane5 < 0) */
+                /* //    continue; */
+                /* else if (pointPlane0 < 0 && pointPlane1 < 0 && pointPlane2 < 0 && pointPlane3 < 0 && pointPlane4 < 0 && pointPlane5 < 0) */
+                /* { */
+                /*     glm::vec3 normal; */
+
+                /*     if (prevNormalDots[i].second[0] > 0) */
+                /*         normal = objFaces[0].Normal; */
+                /*     else if (prevNormalDots[i].second[1] > 0) */
+                /*         normal = objFaces[1].Normal; */
+                /*     else if (prevNormalDots[i].second[2] > 0) */
+                /*         normal = objFaces[2].Normal; */
+                /*     else if (prevNormalDots[i].second[3] > 0) */
+                /*         normal = objFaces[3].Normal; */
+                /*     else if (prevNormalDots[i].second[4] > 0) */
+                /*         normal = objFaces[4].Normal; */
+                /*     else if (prevNormalDots[i].second[5] > 0) */
+                /*         normal = objFaces[5].Normal; */
+     /* /1*               else */
+                /*         continue;*/ */
+
+                /*     //normal = objFaces[0].Normal; */
+                /*     normal = glm::normalize(glm::vec3(m * glm::vec4(normal, 1))); */
+
+                /*     float dotProduct = 2 * (curVel.x * normal.x + curVel.y * normal.y + curVel.z * normal.z); */
+
+                /*     curVel -= dotProduct * normal; */
+                /* } */
+
+                /* prevNormalDots[i].second[0] = pointPlane0; */
+                /* prevNormalDots[i].second[1] = pointPlane1; */
+                /* prevNormalDots[i].second[2] = pointPlane2; */
+                /* prevNormalDots[i].second[3] = pointPlane3; */
+                /* prevNormalDots[i].second[4] = pointPlane4; */
+                /* prevNormalDots[i].second[5] = pointPlane5; */
             }
 
 
