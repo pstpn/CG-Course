@@ -194,8 +194,8 @@ void Model::updateVelocity()
     {
         glm::vec3 curVel = vertices[i].Velocity;
         glm::vec4 prevPos = mm * glm::vec4(vertices[i].Position, 1);
-        glm::vec4 tPos = glm::vec4(vertices[i].Position + curVel * glTime, 1);
-        glm::vec4 point = mm * tPos;
+        glm::vec4 tPos = glm::vec4(vertices[i].Position, 1);
+        glm::vec4 point = mm * tPos + glm::vec4(curVel * glTime, 0);
 
         //std::cout << point.x << point.y << point.z << " | " << point.w << std::endl;
         if (!isInsideRoom(point))
@@ -253,7 +253,7 @@ void Model::updateVelocity()
                   if(found) {
                     normal = glm::normalize(glm::vec3(m * glm::vec4(normal, 1)));
 
-                    glm::vec3 vel = mm * glm::vec4(curVel, 1);
+                    glm::vec3 vel = glm::vec4(curVel, 1);
 
                     float dotProduct = 2 * glm::dot(vel, normal);
                     curVel -= dotProduct * normal;
@@ -303,8 +303,8 @@ void Model::updateVelocity()
 
         pData[i].Velocity = curVel;
         vertices[i].Velocity = curVel;
-        pData[i].Position = tPos;
-        vertices[i].Position = tPos;
+        pData[i].Position = glm::vec4(glm::vec3(tPos) + curVel * glTime, 1);
+        vertices[i].Position = glm::vec4(glm::vec3(tPos) + curVel * glTime, 1);
 
         if (i == -1000)
             std::cout << vertices[i].Position.x << vertices[i].Position.y << vertices[i].Position.z << " | " << point.w << std::endl;
