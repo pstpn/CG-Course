@@ -115,8 +115,7 @@
       <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <Optimization>Disabled</Optimization>
-      <AdditionalOptions>
-      </AdditionalOptions>
+      <AdditionalOptions> /arch:AVX2 /Ob2</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,8 +155,9 @@
     <ClCompile Include="loader.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="mesh.cpp" />
-    <ClCompile Include="model.cpp" />
+    <ClCompile Include="obstacle.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />
@@ -177,8 +177,10 @@
     <ClInclude Include="loader.hpp" />
     <ClInclude Include="mesh.hpp" />
     <ClInclude Include="model.hpp" />
+    <ClInclude Include="obstacle.hpp" />
     <ClInclude Include="scene.hpp" />
     <ClInclude Include="shader.hpp" />
+    <ClInclude Include="sphere.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

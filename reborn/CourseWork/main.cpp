@@ -1,7 +1,8 @@
-#include "shader.hpp"
-#include "scene.hpp"
-#include "model.hpp"
+#include "loader.hpp"
 #include "camera.hpp"
+#include "scene.hpp"
+#include "sphere.hpp"
+#include "obstacle.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -93,24 +94,34 @@ int main()
     // Create shaders
     Shader shader("shaders/shader.vert", "shaders/shader.frag");
 
+    // Create model loader
+    Loader modelLoader;
+
+    // Create models
+    glm::mat4 mSphere = glm::mat4(1);
+    mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
+    Sphere sphere(mSphere);
+    modelLoader.loadModel("models/icosphere.obj", sphere);
+
+    glm::mat4 mRoom = glm::mat4(1.0f);
+    mRoom = glm::scale(mRoom, glm::vec3(10, 10, 10));
+    Obstacle room(mRoom);
+    modelLoader.loadModel("models/cube.obj", room);
+
+    glm::mat4 mObst = glm::mat4(1.0f);
+    mObst = glm::rotate(mObst, glm::radians(20.0f), glm::vec3(0, 1, 0));
+    Obstacle obst(mObst);
+    modelLoader.loadModel("models/cube.obj", obst);
+
     // Create scene
     Scene scene;
-
-    Model sphere("models/icosphere_2.obj");
-
-    Model room("models/cube.obj");
-    scene.addObject(room);
-
-    Model cube("models/cube.obj");
-    glm::vec3 cubeColor = glm::vec3(1.0f, 0.4, 0.4);
-    sphere.addObject(cube);
+    scene.addObject(sphere);
+    scene.addObject(obst);
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_CULL_FACE);
-
-    //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
 
     // Event loop
     while (!glfwWindowShouldClose(window))
@@ -123,7 +134,8 @@ int main()
         {
             ImGui::Begin("Menu", &showWindow);
             //ImGui::Text("!");
-            ImGui::SliderFloat3("Cube color (R, G, B)", (float *)(&cubeColor), 0.0f, 1.0f);
+            //ImGui::SliderFloat3("Cube color (R, G, B)", (float *)(&cubeColor), 0.0f, 1.0f);
+            //ImGui::SliderAngle("Light source angle", &);
             ImGui::End();
         }
         
@@ -133,11 +145,6 @@ int main()
 
         processInput(window);
 
-        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glCullFace(GL_FRONT);
-
         shader.use();
         shader.setVec4("modelColor", glm::vec4(1.0f, 0.5f, 0.31f, 0.3f));
         shader.setVec3("lightColor", glm::vec3(0.0f, 0.0f, 0.0f));
@@ -146,38 +153,27 @@ int main()
 
         glm::mat4 proj = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
-        glm::mat4 m = glm::mat4(1.0f);
-        m = glm::scale(m, glm::vec3(10, 10, 10));
+
         shader.setMat4("proj", proj);
         shader.setMat4("view", view);
-        shader.setMat4("model", m);
 
-        room.Draw(shader);
+        float glTime = glfwGetTime();
+        room.Draw(shader, glTime, scene);
 
         glCullFace(GL_BACK);
 
-        m = glm::rotate(glm::mat4(1), glm::radians(20.0f), glm::vec3(0, 1, 0));
-        shader.setMat4("model", m);
-        shader.setVec4("modelColor", glm::vec4(cubeColor, 1));
-        shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-
-        cube.Draw(shader);
-
-        glCullFace(GL_FRONT);
-
-        m = glm::mat4(1);
-        m = glm::translate(m, glm::vec3(0, 0, -6.5));
-        shader.setMat4("model", m);
-        shader.setVec4("modelColor", glm::vec4(0.4, 0.5, 0.6, 0.5));
-        shader.setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
-
-        sphere.Draw(shader, true);
+        scene.render(shader, glTime);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        glCullFace(GL_FRONT);
     }
 
     ImGui_ImplOpenGL3_Shutdown();
@@ -247,4 +243,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
         }
     }
+    else if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
