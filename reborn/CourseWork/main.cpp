@@ -100,22 +100,25 @@ int main()
     // Create models
     glm::mat4 mSphere = glm::mat4(1);
     mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
-    Sphere sphere(mSphere);
+    glm::vec4 sphereColor(0.4, 0.5, 0.6, 0.5);
+    Sphere sphere(mSphere, sphereColor, false);
     modelLoader.loadModel("models/icosphere.obj", sphere);
 
     glm::mat4 mRoom = glm::mat4(1.0f);
     mRoom = glm::scale(mRoom, glm::vec3(10, 10, 10));
-    Obstacle room(mRoom);
+    glm::vec4 roomColor(0, 0, 0, 0.2);
+    Obstacle room(mRoom, roomColor, GL_FRONT);
     modelLoader.loadModel("models/cube.obj", room);
 
     glm::mat4 mObst = glm::mat4(1.0f);
     mObst = glm::rotate(mObst, glm::radians(20.0f), glm::vec3(0, 1, 0));
-    Obstacle obst(mObst);
+    glm::vec4 obstColor(0.3, 0.3, 0.3, 1);
+    Obstacle obst(mObst, obstColor, GL_BACK);
     modelLoader.loadModel("models/cube.obj", obst);
 
     // Create scene
     Scene scene;
-    scene.addObject(sphere);
+    scene.addObject(room);
     scene.addObject(obst);
 
     glEnable(GL_DEPTH_TEST);
@@ -138,6 +141,9 @@ int main()
             //ImGui::SliderAngle("Light source angle", &);
             ImGui::End();
         }
+
+        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         float currentFrame = static_cast<float>(glfwGetTime());
         deltaTime = currentFrame - lastFrame;
@@ -146,8 +152,6 @@ int main()
         processInput(window);
 
         shader.use();
-        shader.setVec4("modelColor", glm::vec4(1.0f, 0.5f, 0.31f, 0.3f));
-        shader.setVec3("lightColor", glm::vec3(0.0f, 0.0f, 0.0f));
         shader.setVec3("lightPos", lightPos);
         shader.setVec3("viewPos", camera.Position);
 
@@ -158,22 +162,15 @@ int main()
         shader.setMat4("view", view);
 
         float glTime = glfwGetTime();
-        room.Draw(shader, glTime, scene);
 
-        glCullFace(GL_BACK);
-
-        scene.render(shader, glTime);
+        // scene.render(shader, glTime);
+        sphere.Draw(shader, glTime, scene);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
         glfwPollEvents();
-
-        glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glCullFace(GL_FRONT);
     }
 
     ImGui_ImplOpenGL3_Shutdown();

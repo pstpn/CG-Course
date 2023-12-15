@@ -9,17 +9,32 @@
 class Sphere : public Model
 {
 public:
-    glm::mat4 modelMatrix;
+    ModelSettings modelSettings;
 
     std::vector<unsigned int> indices;
     std::vector<Vertex> vertices;
+    std::vector<Face> faces;
 
     std::vector<Mesh> meshes;
 
-    Sphere() : modelMatrix(1.0f) {};
-    Sphere(glm::mat4& modelMatrix) : modelMatrix(modelMatrix) {};
+    Sphere(glm::mat4& modelMatrix, glm::vec4& modelColor, bool lightingEnable = true)
+    {
+        modelSettings.modelMatrix = modelMatrix;
+        modelSettings.color = modelColor;
+        modelSettings.lightingEnable = lightingEnable;
+        modelSettings.inviseMode = GL_FRONT;
+    };
 
     void Draw(Shader& shader, float& glTime, Scene& scene);
+
+    void pushMesh(const Mesh& mesh);
+    void pushIndex(const unsigned int& index);
+    void pushVertex(const Vertex& vertex);
+    void pushFace(const Face& face);
+
+    std::vector<unsigned int>& getIndices();
+    std::vector<Vertex>& getVertices();
+    std::vector<Face>& getFaces();
 
     void toWorld();
 

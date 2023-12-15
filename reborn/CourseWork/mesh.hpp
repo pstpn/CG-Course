@@ -7,6 +7,8 @@
 #include <GLFW/glfw3.h>
 
 
+class Model;
+
 struct Vertex 
 {
     glm::vec3 Position;
@@ -23,16 +25,13 @@ struct Face
 class Mesh 
 {
 public:
-    std::vector<Vertex>       vertices;
-    std::vector<unsigned int> indices;
-
-    Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices);
+    Mesh(Model& model);
 
     void Bind();
     void Draw(Shader& shader);
     void Unbind();
 private:
-    unsigned int VAO, VBO, EBO;
+    unsigned int VAO, VBO, EBO, indicesSize;
 
-    void setupMesh();
+    void setupMesh(Model& model);
 };

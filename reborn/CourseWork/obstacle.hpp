@@ -9,7 +9,7 @@
 class Obstacle : public Model
 {
 public:
-    glm::mat4 modelMatrix;
+    ModelSettings modelSettings;
 
     std::vector<unsigned int> indices;
     std::vector<Vertex> vertices;
@@ -17,10 +17,24 @@ public:
 
     std::vector<Mesh> meshes;
 
-    Obstacle() : modelMatrix(1.0f) {};
-    Obstacle(glm::mat4& modelMatrix) : modelMatrix(modelMatrix) {};
+    Obstacle(glm::mat4& modelMatrix, glm::vec4& modelColor, int inviseMode, bool lightingEnable=true)
+    {
+        modelSettings.modelMatrix = modelMatrix;
+        modelSettings.color = modelColor;
+        modelSettings.lightingEnable = lightingEnable;
+        modelSettings.inviseMode = inviseMode;
+    };
 
     void Draw(Shader& shader, float& glTime, Scene& scene);
+
+    void pushMesh(const Mesh& mesh);
+    void pushIndex(const unsigned int& index);
+    void pushVertex(const Vertex& vertex);
+    void pushFace(const Face& face);
+
+    std::vector<unsigned int>& getIndices();
+    std::vector<Vertex>& getVertices();
+    std::vector<Face>& getFaces();
 
     void toWorld();
 };

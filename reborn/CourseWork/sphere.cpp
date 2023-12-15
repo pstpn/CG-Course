@@ -5,6 +5,13 @@ const float EPSILON = 1e-4f;
 
 void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
 {
+    shader.setVec4("modelColor", modelSettings.color);
+    shader.setVec3("lightColor", (modelSettings.lightingEnable) ? 
+        glm::vec3(1.0f, 1.0f, 1.0f) : 
+        glm::vec3(0.0f, 0.0f, 0.0f));
+    shader.setMat4("model", modelSettings.modelMatrix);
+    glCullFace(modelSettings.inviseMode);
+
     unsigned int i;
 
     for (i = 0; i < meshes.size(); ++i)
@@ -16,12 +23,50 @@ void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
     }
 }
 
+void Sphere::pushMesh(const Mesh& mesh)
+{
+    meshes.push_back(mesh);
+}
+
+void Sphere::pushIndex(const unsigned int& index)
+{
+    indices.push_back(index);
+}
+
+void Sphere::pushVertex(const Vertex& vertex)
+{
+    vertices.push_back(vertex);
+}
+
+void Sphere::pushFace(const Face& face)
+{
+    faces.push_back(face);
+}
+
+std::vector<unsigned int>& Sphere::getIndices()
+{
+    return indices;
+}
+
+std::vector<Vertex>& Sphere::getVertices()
+{
+    return vertices;
+}
+
+std::vector<Face>& Sphere::getFaces()
+{
+    return faces;
+}
+
 void Sphere::toWorld()
 {
     unsigned int i;
 
     for (i = 0; i < vertices.size(); ++i)
-        vertices[i].Position = modelMatrix * glm::vec4(vertices[i].Position, 1);
+        vertices[i].Position = modelSettings.modelMatrix * glm::vec4(vertices[i].Position, 1);
+
+    for (i = 0; i < faces.size(); ++i)
+        faces[i].Normal = modelSettings.modelMatrix * glm::vec4(faces[i].Normal, 1);
 }
 
 bool Sphere::isInsideRoom(glm::vec3& point)
@@ -77,7 +122,7 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
 
     glm::vec3 curPos, curVel, worldPoint;;
 
-    std::vector<Model> sceneObjects = scene.getObjects();
+    std::vector<Model*> sceneObjects = scene.getObjects();
     std::vector<Face> objFaces;
     std::vector<Vertex> objVertices;
 
@@ -99,8 +144,8 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
         else
             for (j = 0; j < sceneObjects.size(); ++j)
             {
-                objVertices = sceneObjects[j].vertices;
-                objFaces = sceneObjects[j].faces;
+                objVertices = sceneObjects[j]->getVertices();
+                objFaces = sceneObjects[j]->getFaces();
 
                 glm::vec3 pointToVertex0 = worldPoint - objVertices[objFaces[0].Triangles.first.z].Position;
                 glm::vec3 pointToVertex1 = worldPoint - objVertices[objFaces[1].Triangles.first.z].Position;

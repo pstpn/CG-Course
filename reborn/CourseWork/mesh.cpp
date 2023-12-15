@@ -1,12 +1,13 @@
 #include "mesh.hpp"
+#include "model.hpp"
 
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<unsigned int>& indices)
+Mesh::Mesh(Model& model)
 {
-    this->vertices = vertices;
-    this->indices = indices;
+    indicesSize = model.getIndices().size();
 
-    setupMesh();
+    model.toWorld();
+    setupMesh(model);
 }
 
 void Mesh::Bind()
@@ -17,7 +18,7 @@ void Mesh::Bind()
 
 void Mesh::Draw(Shader& shader)
 {
-    glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, indicesSize, GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::Unbind()
@@ -26,8 +27,11 @@ void Mesh::Unbind()
     glBindVertexArray(0);
 }
 
-void Mesh::setupMesh()
+void Mesh::setupMesh(Model& model)
 {
+    std::vector<unsigned int> indices = model.getIndices();
+    std::vector<Vertex> vertices = model.getVertices();
+
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);

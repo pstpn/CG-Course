@@ -1,29 +1,40 @@
 #include "loader.hpp"
+#include "model.hpp"
 
 
-void Loader::loadModel(const char* path, Model& model)
+void Loader::loadModel(const std::string& path, Model& model)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs |
-        aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
+    const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | 
+        aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
 
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
     {
         std::cout << "Failed to import model file: " << importer.GetErrorString() << std::endl;
         return;
     }
+    directory = path.substr(0, path.find_last_of('/'));
 
     processNode(scene->mRootNode, scene, model);
 }
 
 void Loader::processNode(aiNode* node, const aiScene* scene, Model& model)
 {
-    aiMesh* mesh = scene->mMeshes[0];
-    model.meshes.push_back(processMesh(mesh, scene, model));
+    unsigned int i;
+
+    for (i = 0; i < node->mNumMeshes; ++i)
+    {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        model.pushMesh(processMesh(mesh, scene, model));
+    }
+    for (i = 0; i < node->mNumChildren; ++i)
+        processNode(node->mChildren[i], scene, model);
 }
 
 Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
 {
+    std::vector<Vertex>& vertices = model.getVertices();
+
     Vertex vertex;
     Face face;
     glm::vec3 pos, normal, velocity;
@@ -50,13 +61,13 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
         vertex.Normal = normal;
         vertex.Velocity = velocity;
 
-        model.vertices.push_back(vertex);
+        model.pushVertex(vertex);
     }
     for (i = 0; i < mesh->mNumFaces; ++i)
     {
         aiFace = mesh->mFaces[i];
         for (j = 0; j < aiFace.mNumIndices; ++j)
-            model.indices.push_back(aiFace.mIndices[j]);
+            model.pushIndex(aiFace.mIndices[j]);
     }
     for (i = 0; i < mesh->mNumFaces; i += 2)
     {
@@ -73,23 +84,21 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
         );
 
         glm::vec3 faceVec1 = glm::vec3(
-            model.vertices[face.Triangles.second.y].Position.x - model.vertices[face.Triangles.first.x].Position.x,
-            model.vertices[face.Triangles.second.y].Position.y - model.vertices[face.Triangles.first.x].Position.y,
-            model.vertices[face.Triangles.second.y].Position.z - model.vertices[face.Triangles.first.x].Position.z
+            vertices[face.Triangles.second.y].Position.x - vertices[face.Triangles.first.x].Position.x,
+            vertices[face.Triangles.second.y].Position.y - vertices[face.Triangles.first.x].Position.y,
+            vertices[face.Triangles.second.y].Position.z - vertices[face.Triangles.first.x].Position.z
         );
 
         glm::vec3 faceVec2 = glm::vec3(
-            model.vertices[face.Triangles.second.z].Position.x - model.vertices[face.Triangles.first.x].Position.x,
-            model.vertices[face.Triangles.second.z].Position.y - model.vertices[face.Triangles.first.x].Position.y,
-            model.vertices[face.Triangles.second.z].Position.z - model.vertices[face.Triangles.first.x].Position.z
+            vertices[face.Triangles.second.z].Position.x - vertices[face.Triangles.first.x].Position.x,
+            vertices[face.Triangles.second.z].Position.y - vertices[face.Triangles.first.x].Position.y,
+            vertices[face.Triangles.second.z].Position.z - vertices[face.Triangles.first.x].Position.z
         );
 
         face.Normal = glm::normalize(glm::cross(faceVec1, faceVec2));
 
-        model.faces.push_back(face);
+        model.pushFace(face);
     }
 
-    model.toWorld();
-
-    return Mesh(model.vertices, model.indices);
+    return Mesh(model);
 }
