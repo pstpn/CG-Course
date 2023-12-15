@@ -102,29 +102,28 @@ int main()
     mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
     glm::vec4 sphereColor(0.4, 0.5, 0.6, 0.5);
     Sphere sphere(mSphere, sphereColor, false);
-    modelLoader.loadModel("models/icosphere.obj", sphere);
+    modelLoader.loadModel("models/teapot.obj", sphere);
 
     glm::mat4 mRoom = glm::mat4(1.0f);
     mRoom = glm::scale(mRoom, glm::vec3(10, 10, 10));
-    glm::vec4 roomColor(0, 0, 0, 0.2);
+    glm::vec4 roomColor(1, 1, 1, 0.2);
     Obstacle room(mRoom, roomColor, GL_FRONT);
     modelLoader.loadModel("models/cube.obj", room);
 
     glm::mat4 mObst = glm::mat4(1.0f);
     mObst = glm::rotate(mObst, glm::radians(20.0f), glm::vec3(0, 1, 0));
-    glm::vec4 obstColor(0.3, 0.3, 0.3, 1);
+    glm::vec4 obstColor(0.2, 0.2, 0.2, 1);
     Obstacle obst(mObst, obstColor, GL_BACK);
     modelLoader.loadModel("models/cube.obj", obst);
 
     // Create scene
     Scene scene;
-    scene.addObject(room);
     scene.addObject(obst);
 
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_BLEND);
+    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glEnable(GL_CULL_FACE);
 
     // Event loop
     while (!glfwWindowShouldClose(window))
@@ -163,7 +162,8 @@ int main()
 
         float glTime = glfwGetTime();
 
-        // scene.render(shader, glTime);
+        room.Draw(shader, glTime, scene);
+        scene.render(shader, glTime);
         sphere.Draw(shader, glTime, scene);
 
         ImGui::Render();

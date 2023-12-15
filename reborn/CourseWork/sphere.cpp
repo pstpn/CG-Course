@@ -116,15 +116,11 @@ bool Sphere::isIntersecting(
 
 void Sphere::updateVelocity(Scene& scene, float& glTime)
 {
-    Vertex* pData = (Vertex*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-
     unsigned int i, j, k;
 
-    glm::vec3 curPos, curVel, worldPoint;;
+    glm::vec3 curPos, curVel, normal, worldPoint;
 
     std::vector<Model*> sceneObjects = scene.getObjects();
-    std::vector<Face> objFaces;
-    std::vector<Vertex> objVertices;
 
     for (i = 0; i < vertices.size(); ++i)
     {
@@ -144,8 +140,8 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
         else
             for (j = 0; j < sceneObjects.size(); ++j)
             {
-                objVertices = sceneObjects[j]->getVertices();
-                objFaces = sceneObjects[j]->getFaces();
+                std::vector<Vertex>& objVertices = sceneObjects[j]->getVertices();
+                std::vector<Face>& objFaces = sceneObjects[j]->getFaces();
 
                 glm::vec3 pointToVertex0 = worldPoint - objVertices[objFaces[0].Triangles.first.z].Position;
                 glm::vec3 pointToVertex1 = worldPoint - objVertices[objFaces[1].Triangles.first.z].Position;
@@ -164,29 +160,32 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
                 if (pointPlane0 < 0 && pointPlane1 < 0 && pointPlane2 < 0 && pointPlane3 < 0 && pointPlane4 < 0 && pointPlane5 < 0)
                     for (k = 0; k < 6; ++k)
                         if (isIntersecting(
-                            glm::vec3(curPos),
-                            glm::vec3(worldPoint),
-                            glm::vec3(objVertices[objFaces[k].Triangles.first.x].Position),
-                            glm::vec3(objVertices[objFaces[k].Triangles.first.y].Position),
-                            glm::vec3(objVertices[objFaces[k].Triangles.first.z].Position)) ||
+                            curPos,
+                            worldPoint,
+                            objVertices[objFaces[k].Triangles.first.x].Position,
+                            objVertices[objFaces[k].Triangles.first.y].Position,
+                            objVertices[objFaces[k].Triangles.first.z].Position) ||
                             isIntersecting(
-                                glm::vec3(curPos),
-                                glm::vec3(worldPoint),
-                                glm::vec3(objVertices[objFaces[k].Triangles.second.x].Position),
-                                glm::vec3(objVertices[objFaces[k].Triangles.second.y].Position),
-                                glm::vec3(objVertices[objFaces[k].Triangles.second.z].Position)))
+                                curPos,
+                                worldPoint,
+                                objVertices[objFaces[k].Triangles.second.x].Position,
+                                objVertices[objFaces[k].Triangles.second.y].Position,
+                                objVertices[objFaces[k].Triangles.second.z].Position))
                         {
-                            curVel -= 2 * glm::dot(curVel, objFaces[k].Normal) * objFaces[k].Normal;
+                            normal = glm::normalize(objFaces[k].Normal);
+                            float dotProduct = 2 * glm::dot(curVel, normal);
+                            curVel -= dotProduct * normal;
                             break;
                         }
             }
 
-        pData[i].Velocity = curVel;
         vertices[i].Velocity = curVel;
-
-        pData[i].Position = curPos + curVel * glTime;
         vertices[i].Position = curPos + curVel * glTime;
     }
+
+    Vertex* pData = (Vertex*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+
+    memcpy(pData, &vertices[0], vertices.size() * sizeof(Vertex));
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
 }
