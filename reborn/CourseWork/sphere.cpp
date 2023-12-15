@@ -183,6 +183,30 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
         vertices[i].Position = curPos + curVel * glTime;
     }
 
+    for (const auto& face : faces)
+    {
+        if (
+            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.y].Position) > 0.1 ||
+            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.z].Position) > 0.1 ||
+            glm::distance(vertices[face.Triangles.first.y].Position, vertices[face.Triangles.first.z].Position) > 0.1
+            )
+        {
+            vertices[face.Triangles.first.x].Position = glm::vec3(INT_MAX);
+            vertices[face.Triangles.first.y].Position = glm::vec3(INT_MAX);
+            vertices[face.Triangles.first.z].Position = glm::vec3(INT_MAX);
+        }
+        if (
+            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.y].Position) > 0.1 ||
+            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.z].Position) > 0.1 ||
+            glm::distance(vertices[face.Triangles.second.y].Position, vertices[face.Triangles.second.z].Position) > 0.1
+            )
+        {
+            vertices[face.Triangles.second.x].Position = glm::vec3(INT_MAX);
+            vertices[face.Triangles.second.y].Position = glm::vec3(INT_MAX);
+            vertices[face.Triangles.second.z].Position = glm::vec3(INT_MAX);
+        }
+    }
+
     Vertex* pData = (Vertex*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
     memcpy(pData, &vertices[0], vertices.size() * sizeof(Vertex));

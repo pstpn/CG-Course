@@ -35,6 +35,9 @@ float lastX = SCR_WIDTH / 2.0f;
 float lastY = SCR_HEIGHT / 2.0f;
 bool firstMouse = true;
 
+bool ctrlPressed = false;
+bool cursorVisible = false;
+
 // timing
 float deltaTime = 0.0f;
 float lastFrame = 0.0f;
@@ -43,7 +46,13 @@ float lastFrame = 0.0f;
 bool showWindow = true;
 
 // lighting
-glm::vec3 lightPos(10, 5, 10);
+glm::vec3 lightPos(10, 50, 10);
+
+
+float color[3] = { 1.0f, 1.0f, 1.0f };
+glm::vec3 objectPosition(0.0f);
+glm::vec3 objectScale(1.0f);
+glm::vec3 objectRotation(0.0f);
 
 
 int main()
@@ -100,15 +109,15 @@ int main()
     // Create models
     glm::mat4 mSphere = glm::mat4(1);
     mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
-    glm::vec4 sphereColor(0.4, 0.5, 0.6, 0.5);
-    Sphere sphere(mSphere, sphereColor, false);
-    modelLoader.loadModel("models/teapot.obj", sphere);
+    glm::vec4 sphereColor(1, 1, 1, 0.8);
+    Sphere sphere(mSphere, sphereColor);
+    modelLoader.loadModel("models/sphere.obj", sphere);
 
     glm::mat4 mRoom = glm::mat4(1.0f);
-    mRoom = glm::scale(mRoom, glm::vec3(10, 10, 10));
-    glm::vec4 roomColor(1, 1, 1, 0.2);
-    Obstacle room(mRoom, roomColor, GL_FRONT);
-    modelLoader.loadModel("models/cube.obj", room);
+    mRoom = glm::scale(mRoom, glm::vec3(20, 20, 20));
+    glm::vec4 roomColor(1.0f, 0.5f, 0.31f, 0.3f);
+    Obstacle room(mRoom, roomColor, GL_FRONT, false);
+    modelLoader.loadModel("models/room.obj", room);
 
     glm::mat4 mObst = glm::mat4(1.0f);
     mObst = glm::rotate(mObst, glm::radians(20.0f), glm::vec3(0, 1, 0));
@@ -121,9 +130,11 @@ int main()
     scene.addObject(obst);
 
     glEnable(GL_DEPTH_TEST);
-    //glEnable(GL_BLEND);
-    //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glEnable(GL_CULL_FACE);
+
+    float angle = 0;
+
+    
+    Obstacle* newObst;
 
     // Event loop
     while (!glfwWindowShouldClose(window))
@@ -134,10 +145,51 @@ int main()
 
         if (showWindow)
         {
-            ImGui::Begin("Menu", &showWindow);
-            //ImGui::Text("!");
-            //ImGui::SliderFloat3("Cube color (R, G, B)", (float *)(&cubeColor), 0.0f, 1.0f);
-            //ImGui::SliderAngle("Light source angle", &);
+            ImGui::Begin("Object Placement", nullptr, ImGuiWindowFlags_NoCollapse);
+
+            ImGui::Text("Select color for new model: ");
+            ImGui::ColorEdit3("RGB Color", color);
+
+            ImGui::Text("New object position");
+            ImGui::SliderFloat("X##Position", &objectPosition.x, -8, 8);
+            ImGui::SliderFloat("Y##Position", &objectPosition.y, -8, 8);
+            ImGui::SliderFloat("Z##Position", &objectPosition.z, -8, 8);
+
+            // Input fields for object scale
+            ImGui::Text("Object Scale");
+            ImGui::SliderFloat("X##Scale", &objectScale.x, 0.1, 3);
+            ImGui::SliderFloat("Y##Scale", &objectScale.y, 0.1, 3);
+            ImGui::SliderFloat("Z##Scale", &objectScale.z, 0.1, 3);
+
+            // Input fields for object rotation
+            ImGui::Text("Object Rotation (in degrees)");
+            ImGui::SliderAngle("X##Rotation", &objectRotation.x, 0, 360);
+            ImGui::SliderAngle("Y##Rotation", &objectRotation.y, 0, 360);
+            ImGui::SliderAngle("Z##Rotation", &objectRotation.z, 0, 360);
+
+            if (ImGui::Button("Place Model", ImVec2(100, 40)))
+            {
+                glm::mat4 modelMatrix = glm::mat4(1);
+
+                modelMatrix = glm::rotate(modelMatrix, objectRotation.x, glm::vec3(1, 0, 0));
+                modelMatrix = glm::rotate(modelMatrix, objectRotation.y, glm::vec3(0, 1, 0));
+                modelMatrix = glm::rotate(modelMatrix, objectRotation.z, glm::vec3(0, 0, 1));
+
+                modelMatrix = glm::scale(modelMatrix, objectScale);
+
+                modelMatrix = glm::translate(modelMatrix, objectPosition);
+
+                glm::vec4 modelColor = glm::vec4(color[0], color[1], color[2], 1);
+
+                //Obstacle newObst(modelMatrix, modelColor, GL_FRONT);
+                newObst = new Obstacle(modelMatrix, modelColor, GL_FRONT);
+                modelLoader.loadModel("models/cube.obj", *newObst);
+                scene.addObject(*newObst);
+            }
+
+            // Удаление
+            //ImGui::Combo("##objectcombo", &selectedObjectIndex, objectList, IM_ARRAYSIZE(objectList));
+
             ImGui::End();
         }
 
@@ -162,7 +214,13 @@ int main()
 
         float glTime = glfwGetTime();
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_CULL_FACE);
         room.Draw(shader, glTime, scene);
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_CULL_FACE);
         scene.render(shader, glTime);
         sphere.Draw(shader, glTime, scene);
 
@@ -204,6 +262,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 {
+    if (cursorVisible) {
+        return;
+    }
     float xpos = static_cast<float>(xposIn);
     float ypos = static_cast<float>(yposIn);
     if (firstMouse)
@@ -224,23 +285,24 @@ void mouse_callback(GLFWwindow* window, double xposIn, double yposIn)
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_LEFT_CONTROL && action == GLFW_PRESS)
+    if (key == GLFW_KEY_LEFT_CONTROL)
     {
-        int mouse_enabled = glfwGetInputMode(window, GLFW_CURSOR);
-
-        if (mouse_enabled == GLFW_CURSOR_NORMAL)
+        if (action == GLFW_PRESS)
         {
-            glfwSetCursorPosCallback(window, mouse_callback);
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-        }
-        else
-        {
-            glfwSetCursorPosCallback(window, ImGui_ImplGlfw_CursorPosCallback);
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-            glfwSetCursorPos(window, SCR_WIDTH / 2, SCR_HEIGHT / 2);
+            ctrlPressed = true;
+            cursorVisible = !cursorVisible; // Инвертируем состояние видимости курсора
+            if (cursorVisible)
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL); // Показать курсор
+            }
+            else
+            {
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED); // Спрятать курсор
+            }
         }
     }
-    else if (key == GLFW_KEY_1 && action == GLFW_PRESS)
+
+    if (key == GLFW_KEY_1 && action == GLFW_PRESS)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else if (key == GLFW_KEY_2 && action == GLFW_PRESS)
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);

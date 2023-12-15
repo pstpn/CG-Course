@@ -17,8 +17,8 @@ struct ModelSettings
 class Model
 {
 public:
-    glm::vec4 maxRoomVert = glm::mat4(1.0f) * (glm::vec4(1, 1, 1, 1) * 10.0f);
-    glm::vec4 minRoomVert = glm::mat4(1.0f) * (glm::vec4(-1, -1, -1, 1) * 10.0f);
+    glm::vec4 maxRoomVert = glm::mat4(1.0f) * (glm::vec4(1, 1, 1, 1) * 20.0f);
+    glm::vec4 minRoomVert = glm::mat4(1.0f) * (glm::vec4(-1, -1, -1, 1) * 20.0f);
 
     virtual void Draw(Shader& shader, float& glTime, Scene& scene) = 0;
 
