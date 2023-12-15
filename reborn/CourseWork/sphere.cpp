@@ -10,7 +10,7 @@ void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
         glm::vec3(1.0f, 1.0f, 1.0f) : 
         glm::vec3(0.0f, 0.0f, 0.0f));
     shader.setMat4("model", modelSettings.modelMatrix);
-    glCullFace(modelSettings.inviseMode);
+    //glCullFace(modelSettings.inviseMode);
 
     unsigned int i;
 

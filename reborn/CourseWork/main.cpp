@@ -86,11 +86,11 @@ int main()
     // Create GUI
     Gui gui(window, modelLoader, scene);
 
-    //glm::mat4 mSphere = glm::mat4(1);
-    //mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
-    //glm::vec4 sphereColor(1, 1, 1, 0.8);
-    //Sphere sphere(mSphere, sphereColor);
-    //modelLoader.loadModel("models/sphere.obj", sphere);
+    glm::mat4 mSphere = glm::mat4(1);
+    mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
+    glm::vec4 sphereColor(1, 1, 1, 0.8);
+    Sphere sphere(mSphere, sphereColor);
+    modelLoader.loadModel("models/sphere_big.obj", sphere);
 
     // Enable Z-buffer
     glEnable(GL_DEPTH_TEST);
@@ -123,12 +123,13 @@ int main()
         float glTime = glfwGetTime();
 
         scene.render(shader, glTime);
+        sphere.Draw(shader, glTime, scene);
 
         //glEnable(GL_BLEND);
         //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glEnable(GL_CULL_FACE);
 
-        gui.Render();
+        gui.EndRenderUI();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }

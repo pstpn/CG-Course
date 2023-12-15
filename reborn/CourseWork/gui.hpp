@@ -1,8 +1,12 @@
+#pragma once
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
 #include <glm/glm.hpp>
+
+#pragma execution_character_set("utf-8")
 
 
 class Gui 
@@ -16,7 +20,10 @@ public:
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
+
         ImGuiIO& io = ImGui::GetIO();
+        io.Fonts->AddFontFromFileTTF("fonts/clear-sans.ttf", 15, NULL, io.Fonts->GetGlyphRangesCyrillic());
+
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
@@ -45,7 +52,7 @@ public:
         ImVec4* colors = style.Colors;
         colors[ImGuiCol_Text] = ImVec4(0.8f, 0.8f, 1.0f, 1.0f);
         colors[ImGuiCol_TextDisabled] = ImVec4(0.4f, 0.4f, 0.5f, 1.0f);
-        colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.2f, 0.7f);
+        colors[ImGuiCol_WindowBg] = ImVec4(0.1f, 0.1f, 0.2f, 0.4f);
         colors[ImGuiCol_ChildBg] = ImVec4(0.1f, 0.1f, 0.2f, 0.7f);
         colors[ImGuiCol_PopupBg] = ImVec4(0.1f, 0.1f, 0.2f, 0.9f);
         colors[ImGuiCol_Border] = ImVec4(0.8f, 0.8f, 1.0f, 0.0f);
@@ -62,7 +69,7 @@ public:
 
         ImGui::ColorEdit3("New model color", color);
 
-        ImGui::Text("Object position");
+        ImGui::Text("Привет");
         ImGui::SliderFloat("X##Position", &objectPosition.x, -8, 8);
         ImGui::SliderFloat("Y##Position", &objectPosition.y, -8, 8);
         ImGui::SliderFloat("Z##Position", &objectPosition.z, -8, 8);
@@ -93,22 +100,29 @@ public:
 
             newModel = new Obstacle(modelMatrix, modelColor, GL_FRONT);
             modelsLoader.loadModel(cubeModel, *newModel);
-            scene.addObject(*newModel);
+            scene.addObject(newModel);
 
             modelNames.push_back((std::string("Model ") + std::to_string(++modelsCount)).c_str());
         }
 
-        if (ImGui::Button("Delete Model", ImVec2(100, 40)))
+        if (ImGui::Button("Delete Model", ImVec2(100, 40)) && modelsCount > 0)
         {
             int deletedModel;
 
             ImGui::ListBox("##objectcombo", &deletedModel, &modelNames[0], IM_ARRAYSIZE(&modelNames[0]));
+
+            --modelsCount;
         }
     }
 
-    void RenderCameraMenu()
+    void RenderLightingMenu()
     {
-        ImGui::Text("Camera Menu");
+        ImGui::Text("Lighting Menu");
+    }
+
+    void RenderWaveSourceMenu()
+    {
+        ImGui::Text("Wave Source Menu");
     }
 
     void RenderUI()
@@ -124,29 +138,43 @@ public:
         if (ImGui::CollapsingHeader("Obstacles"))
         {
             showObstacleMenu = true;
-            showCameraMenu = false;
+            showLightingMenu = false;
+            showWaveSourceMenu = false;
         }
         else
             showObstacleMenu = false;
 
-        if (ImGui::CollapsingHeader("Camera"))
+        if (ImGui::CollapsingHeader("Освещение"))
         {
-            showCameraMenu = true;
+            showLightingMenu = true;
             showObstacleMenu = false;
+            showWaveSourceMenu = false;
         }
         else
-            showCameraMenu = false;
+            showLightingMenu = false;
+
+        if (ImGui::CollapsingHeader("Wave Source"))
+        {
+            showWaveSourceMenu = true;
+            showObstacleMenu = false;
+            showLightingMenu = false;
+        }
+        else
+            showWaveSourceMenu = false;
 
         if (showObstacleMenu)
             RenderObstacleMenu();
 
-        if (showCameraMenu)
-            RenderCameraMenu();
+        if (showLightingMenu)
+            RenderLightingMenu();
+
+        if (showWaveSourceMenu)
+            RenderWaveSourceMenu();
 
         ImGui::End();
     }
 
-    void Render()
+    void EndRenderUI()
     {
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -162,12 +190,13 @@ private:
     int modelsCount = 0;
     std::vector<const char*> modelNames;
 
-    float color[3] = { 1.0f, 1.0f, 1.0f };
+    float color[3] = { 0.2f, 0.3f, 0.4f };
 
     glm::vec3 objectPosition = glm::vec3(0.0f);
     glm::vec3 objectScale = glm::vec3(1.0f);
     glm::vec3 objectRotation = glm::vec3(0.0f);
 
     bool showObstacleMenu = false;
-    bool showCameraMenu = false;
+    bool showLightingMenu = false;
+    bool showWaveSourceMenu = false;
 };

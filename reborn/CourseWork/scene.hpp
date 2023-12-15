@@ -9,6 +9,7 @@ class Scene
 {
 public:
     void addObject(Model& obj);
+    void addObject(Model* obj);
     void render(Shader& shaders, float& glTime);
     std::vector<Model*>& getObjects();
 
