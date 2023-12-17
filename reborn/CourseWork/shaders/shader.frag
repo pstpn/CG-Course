@@ -2,8 +2,9 @@
 
 out vec4 FragColor;
 
-in vec3 Normal;  
+in vec3 Normal;
 in vec3 FragPos;
+flat in int discardDraw;
 
 uniform vec3 lightPos; 
 uniform vec3 viewPos; 
@@ -11,7 +12,10 @@ uniform vec3 lightColor;
 uniform vec4 modelColor;
 
 void main()
-{    
+{
+    if (discardDraw == 1)
+        discard;
+
     // ambient
     float ambientStrength = 0.5;
     vec3 ambient = ambientStrength * lightColor;

@@ -26,7 +26,8 @@ public:
     virtual void Draw(Shader& shader, float& glTime, Scene& scene) = 0;
 
     virtual void setColor(glm::vec4& newColor) = 0;
-    virtual glm::vec4& getColor() = 0;
+    virtual void setModelMatrix(glm::mat4& modelMatrix) = 0;
+    virtual void setSpeed(float& speed) = 0;
 
     virtual void pushMesh(const Mesh& mesh) = 0;
     virtual void pushIndex(const unsigned int& index) = 0;
@@ -36,7 +37,10 @@ public:
     virtual std::vector<unsigned int>& getIndices() = 0;
     virtual std::vector<Vertex>& getVertices() = 0;
     virtual std::vector<Face>& getFaces() = 0;
+    virtual std::vector<Mesh>& getMeshes() = 0;
+    virtual glm::mat4& getModelMatrix() = 0;
     virtual float getSpeed() = 0;
+    virtual glm::vec4& getColor() = 0;
 
     virtual void toWorld() = 0;
 };

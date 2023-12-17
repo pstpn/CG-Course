@@ -29,7 +29,8 @@ public:
     void Draw(Shader& shader, float& glTime, Scene& scene);
 
     void setColor(glm::vec4& newColor);
-    glm::vec4& getColor();
+    void setModelMatrix(glm::mat4& modelMatrix);
+    void setSpeed(float& speed);
 
     void pushMesh(const Mesh& mesh);
     void pushIndex(const unsigned int& index);
@@ -39,7 +40,10 @@ public:
     std::vector<unsigned int>& getIndices();
     std::vector<Vertex>& getVertices();
     std::vector<Face>& getFaces();
+    std::vector<Mesh>& getMeshes();
+    glm::mat4& getModelMatrix();
     float getSpeed();
+    glm::vec4& getColor();
 
     void toWorld();
 };

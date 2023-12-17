@@ -30,8 +30,8 @@ public:
     void Bind();
     void Draw(Shader& shader);
     void Unbind();
-private:
-    unsigned int VAO, VBO, EBO, indicesSize;
 
     void setupMesh(Model& model);
+private:
+    unsigned int VAO, VBO, EBO, indicesSize;
 };

@@ -27,11 +27,6 @@ void Obstacle::setColor(glm::vec4& newColor)
     modelSettings.color = newColor;
 }
 
-glm::vec4& Obstacle::getColor()
-{
-    return modelSettings.color;
-}
-
 void Obstacle::pushIndex(const unsigned int& index)
 {
     indices.push_back(index);
@@ -40,6 +35,16 @@ void Obstacle::pushIndex(const unsigned int& index)
 void Obstacle::pushVertex(const Vertex& vertex)
 {
     vertices.push_back(vertex);
+}
+
+void Obstacle::setModelMatrix(glm::mat4& modelMatrix)
+{
+    modelSettings.modelMatrix = modelMatrix;
+}
+
+void Obstacle::setSpeed(float& speed)
+{
+    modelSettings.speed = speed;
 }
 
 void Obstacle::pushFace(const Face& face)
@@ -62,9 +67,24 @@ std::vector<Face>& Obstacle::getFaces()
     return faces;
 }
 
+std::vector<Mesh>& Obstacle::getMeshes()
+{
+    return meshes;
+}
+
+glm::mat4& Obstacle::getModelMatrix()
+{
+    return modelSettings.modelMatrix;
+}
+
 float Obstacle::getSpeed()
 {
     return 0.0f;
+}
+
+glm::vec4& Obstacle::getColor()
+{
+    return modelSettings.color;
 }
 
 void Obstacle::toWorld()

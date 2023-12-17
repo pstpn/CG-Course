@@ -24,9 +24,14 @@ void Sphere::setColor(glm::vec4& newColor)
     modelSettings.color = newColor;
 }
 
-glm::vec4& Sphere::getColor()
+void Sphere::setModelMatrix(glm::mat4& modelMatrix)
 {
-    return modelSettings.color;
+    modelSettings.modelMatrix = modelMatrix;
+}
+
+void Sphere::setSpeed(float& speed)
+{
+    modelSettings.speed = speed;
 }
 
 void Sphere::pushMesh(const Mesh& mesh)
@@ -64,9 +69,24 @@ std::vector<Face>& Sphere::getFaces()
     return faces;
 }
 
+std::vector<Mesh>& Sphere::getMeshes()
+{
+    return meshes;
+}
+
+glm::mat4& Sphere::getModelMatrix()
+{
+    return modelSettings.modelMatrix;
+}
+
 float Sphere::getSpeed()
 {
     return modelSettings.speed;
+}
+
+glm::vec4& Sphere::getColor()
+{
+    return modelSettings.color;
 }
 
 void Sphere::toWorld()
@@ -197,9 +217,9 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
     for (const auto& face : faces)
     {
         if (
-            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.y].Position) > 0.1 ||
-            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.z].Position) > 0.1 ||
-            glm::distance(vertices[face.Triangles.first.y].Position, vertices[face.Triangles.first.z].Position) > 0.1
+            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.y].Position) > 0.09 ||
+            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.z].Position) > 0.09 ||
+            glm::distance(vertices[face.Triangles.first.y].Position, vertices[face.Triangles.first.z].Position) > 0.09
             )
         {
             vertices[face.Triangles.first.x].Position = glm::vec3(INT_MAX);
@@ -207,9 +227,9 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
             vertices[face.Triangles.first.z].Position = glm::vec3(INT_MAX);
         }
         if (
-            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.y].Position) > 0.1 ||
-            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.z].Position) > 0.1 ||
-            glm::distance(vertices[face.Triangles.second.y].Position, vertices[face.Triangles.second.z].Position) > 0.1
+            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.y].Position) > 0.09 ||
+            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.z].Position) > 0.09 ||
+            glm::distance(vertices[face.Triangles.second.y].Position, vertices[face.Triangles.second.z].Position) > 0.09
             )
         {
             vertices[face.Triangles.second.x].Position = glm::vec3(INT_MAX);

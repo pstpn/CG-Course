@@ -23,7 +23,7 @@ public:
         ImGui::CreateContext();
 
         ImGuiIO& io = ImGui::GetIO();
-        io.Fonts->AddFontFromFileTTF("fonts/clear-sans.ttf", 15, NULL, io.Fonts->GetGlyphRangesCyrillic());
+        io.Fonts->AddFontFromFileTTF("fonts/clear-sans.ttf", 18, NULL, io.Fonts->GetGlyphRangesCyrillic());
 
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
@@ -89,7 +89,7 @@ public:
         ImGui::SliderAngle("Y##Поворот", &objectRotation.y, 0, 360);
         ImGui::SliderAngle("Z##Поворот", &objectRotation.z, 0, 360);
 
-        if (ImGui::Button("Разместить препятствие", ImVec2(200, 40)))
+        if (ImGui::Button("Разместить препятствие", ImVec2(300, 40)))
         {
             glm::mat4 modelMatrix = glm::mat4(1.0f);
 
@@ -106,11 +106,10 @@ public:
             newObject = new Obstacle(modelMatrix, modelColor, GL_BACK);
             modelsLoader.loadModel(cubeModel, *newObject);
             scene.addObject(newObject);
-
-            modelNames.push_back((std::string("Модель ") + std::to_string(++modelsCount)).c_str());
+            ++modelsCount;
         }
 
-        if (!showDeleteMenu && ImGui::Button("Удалить препятствие", ImVec2(200, 40)) && modelsCount > 0)
+        if (!showDeleteMenu && ImGui::Button("Удалить препятствие", ImVec2(300, 40)) && modelsCount > 0)
                 showDeleteMenu = true;
         else if (showDeleteMenu)
         {
@@ -131,17 +130,16 @@ public:
                 scene.updateObjectColor(deletedObjectColor, deletedModelIndex);
             }
 
-            if (ImGui::Button("Подтвердить удаление", ImVec2(200, 40)))
+            if (ImGui::Button("Подтвердить удаление", ImVec2(300, 40)))
                 if (deletedModelIndex >= 0 && deletedModelIndex < modelsCount)
                 {
                     scene.removeObject(deletedModelIndex);
-                    modelNames.erase(modelNames.begin() + deletedModelIndex);
-                    --modelsCount;
                     showDeleteMenu = false;
                     deletedModelIndex = 0;
                     prevDeletedModelIndex = -1;
+                    --modelsCount;
                 }
-            if (ImGui::Button("Отмена", ImVec2(200, 40)))
+            if (ImGui::Button("Отмена", ImVec2(300, 40)))
             {
                 scene.updateObjectColor(lastColor, deletedModelIndex);
                 showDeleteMenu = false;
@@ -153,20 +151,20 @@ public:
     {
         ImGui::Text("Меню освещения");
 
-        ImGui::ColorEdit3("Цвет источника света", lightingColor);
+        ImGui::ColorEdit3("Цвет источника", lightingColor);
 
         ImGui::Text("Позиция");
         ImGui::SliderFloat("X##Позиция", &lightingPosition.x, -100, 100);
         ImGui::SliderFloat("Y##Позиция", &lightingPosition.y, -100, 100);
         ImGui::SliderFloat("Z##Позиция", &lightingPosition.z, -100, 100);
 
-        if (ImGui::Button("Установить источник света", ImVec2(200, 40)))
+        if (ImGui::Button("Установить источник света", ImVec2(300, 40)))
         {
             shader.use();
             shader.setVec3("lightColor", glm::vec3(lightingColor[0], lightingColor[1], lightingColor[2]));
             shader.setVec3("lightPos", lightingPosition);
         }
-        if (ImGui::Button("Удалить источник света", ImVec2(200, 40)))
+        if (ImGui::Button("Удалить источник света", ImVec2(300, 40)))
         {
             shader.use();
             shader.setVec3("lightColor", glm::vec3(0, 0, 0));
@@ -185,7 +183,7 @@ public:
         ImGui::Text("Скорость распространения волны");
         ImGui::SliderFloat("S##Скорость", &waveSpeed, 0, 100);
 
-        if (ImGui::Button("Установить источник звуковых волн", ImVec2(200, 40)))
+        if (ImGui::Button("Установить источник звуковых волн", ImVec2(300, 40)))
         {
             glm::mat4 waveMatrix = glm::mat4(1.0f);
 
@@ -196,15 +194,30 @@ public:
             newObject = new Sphere(waveMatrix, newWaveColor, waveSpeed);
             modelsLoader.loadModel(sphereModel, *newObject);
             waves.push_back(newObject);
-            ++wavesCount;
         }
 
-        if (ImGui::Button("Испустить волну из источников", ImVec2(200, 40)))
-        {
-            for (auto& wave: waves)
-                scene.addSphere(wave);
+        if (ImGui::Button("Испустить волну из источников звука", ImVec2(300, 40)))
+            for (auto& wave : waves)
+                scene.addSphere(new Sphere(*wave));
 
-            waves.clear();
+        if (!showDeleteMenu && ImGui::Button("Удалить источник звука", ImVec2(300, 40)) && waves.size() > 0)
+            showDeleteMenu = true;
+        else if (showDeleteMenu)
+        {
+            static int deletedWaveSourceIndex = 0;
+
+            ImGui::Text("Выберите номер источника звука для удаления:");
+            ImGui::SetNextItemWidth(300);
+            ImGui::SliderInt("Выбранный источник", &deletedWaveSourceIndex, 0, waves.size() - 1);
+
+            if (ImGui::Button("Подтвердить удаление", ImVec2(300, 40)))
+                if (deletedWaveSourceIndex >= 0 && deletedWaveSourceIndex < waves.size())
+                {
+                    waves.erase(waves.begin() + deletedWaveSourceIndex);
+                    showDeleteMenu = false;
+                }
+            if (ImGui::Button("Отмена", ImVec2(300, 40)))
+                showDeleteMenu = false;
         }
     }
 
@@ -265,7 +278,7 @@ public:
 
 private:
     const char* cubeModel = "models/cube.obj";
-    const char* sphereModel = "models/sphere_big.obj";
+    const char* sphereModel = "models/sphere_scaled.obj";
 
     Scene& scene;
     Loader& modelsLoader;
@@ -273,8 +286,6 @@ private:
 
     Model* newObject;
     int modelsCount = 0;
-    int wavesCount = 0;
-    std::vector<const char*> modelNames;
 
     float objectColor[3] = { 0.2f, 0.3f, 0.4f };
     glm::vec4 deletedObjectColor = glm::vec4(1, 0, 0, 1);
