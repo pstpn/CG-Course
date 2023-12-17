@@ -4,11 +4,8 @@
 void Obstacle::Draw(Shader& shader, float& glTime, Scene& scene)
 {
     shader.setVec4("modelColor", modelSettings.color);
-    shader.setVec3("lightColor", (modelSettings.lightingEnable) ?
-        glm::vec3(1.0f, 1.0f, 1.0f) :
-        glm::vec3(0.0f, 0.0f, 0.0f));
     shader.setMat4("model", modelSettings.modelMatrix);
-    //glCullFace(modelSettings.inviseMode);
+    glCullFace(modelSettings.inviseMode);
 
     unsigned int i;
 
@@ -23,6 +20,16 @@ void Obstacle::Draw(Shader& shader, float& glTime, Scene& scene)
 void Obstacle::pushMesh(const Mesh& mesh)
 {
     meshes.push_back(mesh);
+}
+
+void Obstacle::setColor(glm::vec4& newColor)
+{
+    modelSettings.color = newColor;
+}
+
+glm::vec4& Obstacle::getColor()
+{
+    return modelSettings.color;
 }
 
 void Obstacle::pushIndex(const unsigned int& index)

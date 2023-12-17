@@ -27,6 +27,9 @@ public:
 
     void Draw(Shader& shader, float& glTime, Scene& scene);
 
+    void setColor(glm::vec4& newColor);
+    glm::vec4& getColor();
+
     void pushMesh(const Mesh& mesh);
     void pushIndex(const unsigned int& index);
     void pushVertex(const Vertex& vertex);

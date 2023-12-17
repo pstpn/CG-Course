@@ -12,10 +12,11 @@
 class Gui 
 {
 public:
-    Gui(GLFWwindow* window, Loader& modelsLoader, Scene& scene) : 
+    Gui(GLFWwindow* window, Loader& modelsLoader, Scene& scene, Shader& shader) : 
         modelsLoader(modelsLoader), 
         scene(scene),
-        newModel(nullptr)
+        shader(shader),
+        newObject(nullptr)
     {
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -36,6 +37,10 @@ public:
 
         // Setup clear color
         ImVec4 clear_color = ImVec4(0.1f, 0.1f, 0.2f, 1.0f);
+
+        shader.use();
+        shader.setVec3("lightColor", glm::vec3(lightingColor[0], lightingColor[1], lightingColor[2]));
+        shader.setVec3("lightPos", lightingPosition);
     }
 
     ~Gui()
@@ -65,28 +70,28 @@ public:
 
     void RenderObstacleMenu() 
     {
-        ImGui::Text("Obstacle Menu");
+        ImGui::Text("Меню препятствий");
 
-        ImGui::ColorEdit3("New model color", color);
+        ImGui::ColorEdit3("Цвет новой модели", objectColor);
 
-        ImGui::Text("Привет");
-        ImGui::SliderFloat("X##Position", &objectPosition.x, -8, 8);
-        ImGui::SliderFloat("Y##Position", &objectPosition.y, -8, 8);
-        ImGui::SliderFloat("Z##Position", &objectPosition.z, -8, 8);
+        ImGui::Text("Позиция");
+        ImGui::SliderFloat("X##Позиция", &objectPosition.x, -8, 8);
+        ImGui::SliderFloat("Y##Позиция", &objectPosition.y, -8, 8);
+        ImGui::SliderFloat("Z##Позиция", &objectPosition.z, -8, 8);
 
-        ImGui::Text("Object Scale");
-        ImGui::SliderFloat("X##Scale", &objectScale.x, 0.1, 3);
-        ImGui::SliderFloat("Y##Scale", &objectScale.y, 0.1, 3);
-        ImGui::SliderFloat("Z##Scale", &objectScale.z, 0.1, 3);
+        ImGui::Text("Масштаб");
+        ImGui::SliderFloat("X##Масштаб", &objectScale.x, 0.1, 3);
+        ImGui::SliderFloat("Y##Масштаб", &objectScale.y, 0.1, 3);
+        ImGui::SliderFloat("Z##Масштаб", &objectScale.z, 0.1, 3);
 
-        ImGui::Text("Object Rotation (in degrees)");
-        ImGui::SliderAngle("X##Rotation", &objectRotation.x, 0, 360);
-        ImGui::SliderAngle("Y##Rotation", &objectRotation.y, 0, 360);
-        ImGui::SliderAngle("Z##Rotation", &objectRotation.z, 0, 360);
+        ImGui::Text("Угол поворота (в градусах)");
+        ImGui::SliderAngle("X##Поворот", &objectRotation.x, 0, 360);
+        ImGui::SliderAngle("Y##Поворот", &objectRotation.y, 0, 360);
+        ImGui::SliderAngle("Z##Поворот", &objectRotation.z, 0, 360);
 
-        if (ImGui::Button("Place Model", ImVec2(100, 40)))
+        if (ImGui::Button("Разместить препятствие", ImVec2(200, 40)))
         {
-            glm::mat4 modelMatrix = glm::mat4(1);
+            glm::mat4 modelMatrix = glm::mat4(1.0f);
 
             modelMatrix = glm::rotate(modelMatrix, objectRotation.x, glm::vec3(1, 0, 0));
             modelMatrix = glm::rotate(modelMatrix, objectRotation.y, glm::vec3(0, 1, 0));
@@ -96,33 +101,103 @@ public:
 
             modelMatrix = glm::translate(modelMatrix, objectPosition);
 
-            glm::vec4 modelColor = glm::vec4(color[0], color[1], color[2], 1);
+            glm::vec4 modelColor = glm::vec4(objectColor[0], objectColor[1], objectColor[2], 1);
 
-            newModel = new Obstacle(modelMatrix, modelColor, GL_FRONT);
-            modelsLoader.loadModel(cubeModel, *newModel);
-            scene.addObject(newModel);
+            newObject = new Obstacle(modelMatrix, modelColor, GL_BACK);
+            modelsLoader.loadModel(cubeModel, *newObject);
+            scene.addObject(newObject);
 
-            modelNames.push_back((std::string("Model ") + std::to_string(++modelsCount)).c_str());
+            modelNames.push_back((std::string("Модель ") + std::to_string(++modelsCount)).c_str());
         }
 
-        if (ImGui::Button("Delete Model", ImVec2(100, 40)) && modelsCount > 0)
+        if (!showDeleteMenu && ImGui::Button("Удалить препятствие", ImVec2(200, 40)) && modelsCount > 0)
+                showDeleteMenu = true;
+        else if (showDeleteMenu)
         {
-            int deletedModel;
+            static int deletedModelIndex = 0;
+            static int prevDeletedModelIndex = -1;
+            static glm::vec4 lastColor = scene.getObjectColor(deletedModelIndex);;
 
-            ImGui::ListBox("##objectcombo", &deletedModel, &modelNames[0], IM_ARRAYSIZE(&modelNames[0]));
+            ImGui::Text("Выберите препятствие для удаления:");
+            ImGui::SetNextItemWidth(220);
+            ImGui::SliderInt("Выбранное препятствие", &deletedModelIndex, 0, modelsCount - 1);
 
-            --modelsCount;
+            if (prevDeletedModelIndex != deletedModelIndex)
+             {
+                if (prevDeletedModelIndex != -1)
+                    scene.updateObjectColor(lastColor, prevDeletedModelIndex);
+                prevDeletedModelIndex = deletedModelIndex;
+                lastColor = scene.getObjectColor(deletedModelIndex);
+                scene.updateObjectColor(deletedObjectColor, deletedModelIndex);
+            }
+
+            if (ImGui::Button("Подтвердить удаление", ImVec2(200, 40)))
+                if (deletedModelIndex >= 0 && deletedModelIndex < modelsCount)
+                {
+                    scene.removeObject(deletedModelIndex);
+                    modelNames.erase(modelNames.begin() + deletedModelIndex);
+                    --modelsCount;
+                    showDeleteMenu = false;
+                    deletedModelIndex = 0;
+                    prevDeletedModelIndex = -1;
+                }
+            if (ImGui::Button("Отмена", ImVec2(200, 40)))
+            {
+                scene.updateObjectColor(lastColor, deletedModelIndex);
+                showDeleteMenu = false;
+            }
         }
     }
 
     void RenderLightingMenu()
     {
-        ImGui::Text("Lighting Menu");
+        ImGui::Text("Меню освещения");
+
+        ImGui::ColorEdit3("Цвет источника света", lightingColor);
+
+        ImGui::Text("Позиция");
+        ImGui::SliderFloat("X##Позиция", &lightingPosition.x, -100, 100);
+        ImGui::SliderFloat("Y##Позиция", &lightingPosition.y, -100, 100);
+        ImGui::SliderFloat("Z##Позиция", &lightingPosition.z, -100, 100);
+
+        if (ImGui::Button("Установить источник света", ImVec2(200, 40)))
+        {
+            shader.use();
+            shader.setVec3("lightColor", glm::vec3(lightingColor[0], lightingColor[1], lightingColor[2]));
+            shader.setVec3("lightPos", lightingPosition);
+        }
     }
 
     void RenderWaveSourceMenu()
     {
-        ImGui::Text("Wave Source Menu");
+        ImGui::Text("Меню источника звука");
+
+        ImGui::Text("Позиция");
+        ImGui::SliderFloat("X##Позиция", &waveSourcePosition.x, -8, 8);
+        ImGui::SliderFloat("Y##Позиция", &waveSourcePosition.y, -8, 8);
+        ImGui::SliderFloat("Z##Позиция", &waveSourcePosition.z, -8, 8);
+
+        if (ImGui::Button("Установить источник звуковых волн", ImVec2(200, 40)))
+        {
+            glm::mat4 waveMatrix = glm::mat4(1.0f);
+
+            waveMatrix = glm::translate(waveMatrix, waveSourcePosition);
+
+            glm::vec4 newWaveColor = glm::vec4(waveColor[0], waveColor[1], waveColor[2], 0.1);
+
+            newObject = new Sphere(waveMatrix, newWaveColor, false);
+            modelsLoader.loadModel(sphereModel, *newObject);
+            waves.push_back(newObject);
+            ++wavesCount;
+        }
+
+        if (ImGui::Button("Испустить волну из источников", ImVec2(200, 40)))
+        {
+            for (auto& wave: waves)
+                scene.addSphere(wave);
+
+            waves.clear();
+        }
     }
 
     void RenderUI()
@@ -131,11 +206,11 @@ public:
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::Begin("Main Menu");
+        ImGui::Begin("Главное меню");
 
         RenderStyle();
 
-        if (ImGui::CollapsingHeader("Obstacles"))
+        if (ImGui::CollapsingHeader("Препятствия"))
         {
             showObstacleMenu = true;
             showLightingMenu = false;
@@ -153,7 +228,7 @@ public:
         else
             showLightingMenu = false;
 
-        if (ImGui::CollapsingHeader("Wave Source"))
+        if (ImGui::CollapsingHeader("Источник звука"))
         {
             showWaveSourceMenu = true;
             showObstacleMenu = false;
@@ -182,21 +257,32 @@ public:
 
 private:
     const char* cubeModel = "models/cube.obj";
+    const char* sphereModel = "models/sphere_big.obj";
 
     Scene& scene;
     Loader& modelsLoader;
+    Shader& shader;
 
-    Model* newModel;
+    Model* newObject;
     int modelsCount = 0;
+    int wavesCount = 0;
     std::vector<const char*> modelNames;
 
-    float color[3] = { 0.2f, 0.3f, 0.4f };
-
+    float objectColor[3] = { 0.2f, 0.3f, 0.4f };
+    glm::vec4 deletedObjectColor = glm::vec4(1, 0, 0, 1);
     glm::vec3 objectPosition = glm::vec3(0.0f);
     glm::vec3 objectScale = glm::vec3(1.0f);
     glm::vec3 objectRotation = glm::vec3(0.0f);
 
+    float lightingColor[3] = { 1.0f, 1.0f, 1.0f };
+    glm::vec3 lightingPosition = glm::vec3(100.0f, 0.0f, -70.0f);
+
+    float waveColor[3] = { 1, 1, 1 };
+    glm::vec3 waveSourcePosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    std::vector<Model*> waves;
+
     bool showObstacleMenu = false;
     bool showLightingMenu = false;
     bool showWaveSourceMenu = false;
+    bool showDeleteMenu = false;
 };

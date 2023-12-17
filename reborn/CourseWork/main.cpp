@@ -20,11 +20,11 @@ void processInput(GLFWwindow* window);
 /**
  * \brief Window width
  */
-const unsigned int SCR_WIDTH = 900;
+const unsigned int SCR_WIDTH = 1920;
 /**
  * \brief Window height
  */
-const unsigned int SCR_HEIGHT = 900;
+const unsigned int SCR_HEIGHT = 1080;
 
 /**
  * \brief Create and setup camera
@@ -84,13 +84,13 @@ int main()
     Scene scene;
 
     // Create GUI
-    Gui gui(window, modelLoader, scene);
+    Gui gui(window, modelLoader, scene, shader);
 
-    glm::mat4 mSphere = glm::mat4(1);
-    mSphere = glm::translate(mSphere, glm::vec3(0, 0, -6.5));
-    glm::vec4 sphereColor(1, 1, 1, 0.8);
-    Sphere sphere(mSphere, sphereColor);
-    modelLoader.loadModel("models/sphere_big.obj", sphere);
+    glm::mat4 mRoom = glm::mat4(1.0f);
+    mRoom = glm::scale(mRoom, glm::vec3(20, 20, 20));
+    glm::vec4 roomColor(0.1f, 0.1f, 0.1f, 0.3f);
+    Obstacle room(mRoom, roomColor, GL_FRONT, false);
+    modelLoader.loadModel("models/room.obj", room);
 
     // Enable Z-buffer
     glEnable(GL_DEPTH_TEST);
@@ -109,25 +109,25 @@ int main()
 
         processInput(window);
 
-        shader.use();
-        shader.setVec3("lightPos", glm::vec3(10, 10, 10));
-        shader.setVec3("viewPos", camera.Position);
-
         glm::mat4 proj = glm::perspective(glm::radians(camera.Zoom), 
             (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         glm::mat4 view = camera.GetViewMatrix();
 
+        shader.use();
+        shader.setVec3("viewPos", camera.Position);
         shader.setMat4("proj", proj);
         shader.setMat4("view", view);
 
         float glTime = glfwGetTime();
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_CULL_FACE);
+        room.Draw(shader, glTime, scene);
+        glDisable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_CULL_FACE);
         scene.render(shader, glTime);
-        sphere.Draw(shader, glTime, scene);
-
-        //glEnable(GL_BLEND);
-        //glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glEnable(GL_CULL_FACE);
 
         gui.EndRenderUI();
         glfwSwapBuffers(window);

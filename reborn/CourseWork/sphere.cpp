@@ -6,11 +6,7 @@ const float EPSILON = 1e-4f;
 void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
 {
     shader.setVec4("modelColor", modelSettings.color);
-    shader.setVec3("lightColor", (modelSettings.lightingEnable) ? 
-        glm::vec3(1.0f, 1.0f, 1.0f) : 
-        glm::vec3(0.0f, 0.0f, 0.0f));
     shader.setMat4("model", modelSettings.modelMatrix);
-    //glCullFace(modelSettings.inviseMode);
 
     unsigned int i;
 
@@ -21,6 +17,16 @@ void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
         meshes[i].Draw(shader);
         meshes[i].Unbind();
     }
+}
+
+void Sphere::setColor(glm::vec4& newColor)
+{
+    modelSettings.color = newColor;
+}
+
+glm::vec4& Sphere::getColor()
+{
+    return modelSettings.color;
 }
 
 void Sphere::pushMesh(const Mesh& mesh)
