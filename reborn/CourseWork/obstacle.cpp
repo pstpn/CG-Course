@@ -62,6 +62,11 @@ std::vector<Face>& Obstacle::getFaces()
     return faces;
 }
 
+float Obstacle::getSpeed()
+{
+    return 0.0f;
+}
+
 void Obstacle::toWorld()
 {
     unsigned int i;

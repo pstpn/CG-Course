@@ -166,6 +166,11 @@ public:
             shader.setVec3("lightColor", glm::vec3(lightingColor[0], lightingColor[1], lightingColor[2]));
             shader.setVec3("lightPos", lightingPosition);
         }
+        if (ImGui::Button("Удалить источник света", ImVec2(200, 40)))
+        {
+            shader.use();
+            shader.setVec3("lightColor", glm::vec3(0, 0, 0));
+        }
     }
 
     void RenderWaveSourceMenu()
@@ -177,6 +182,9 @@ public:
         ImGui::SliderFloat("Y##Позиция", &waveSourcePosition.y, -8, 8);
         ImGui::SliderFloat("Z##Позиция", &waveSourcePosition.z, -8, 8);
 
+        ImGui::Text("Скорость распространения волны");
+        ImGui::SliderFloat("S##Скорость", &waveSpeed, 0, 100);
+
         if (ImGui::Button("Установить источник звуковых волн", ImVec2(200, 40)))
         {
             glm::mat4 waveMatrix = glm::mat4(1.0f);
@@ -185,7 +193,7 @@ public:
 
             glm::vec4 newWaveColor = glm::vec4(waveColor[0], waveColor[1], waveColor[2], 0.1);
 
-            newObject = new Sphere(waveMatrix, newWaveColor, false);
+            newObject = new Sphere(waveMatrix, newWaveColor, waveSpeed);
             modelsLoader.loadModel(sphereModel, *newObject);
             waves.push_back(newObject);
             ++wavesCount;
@@ -279,6 +287,7 @@ private:
 
     float waveColor[3] = { 1, 1, 1 };
     glm::vec3 waveSourcePosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    float waveSpeed = 1.0f;
     std::vector<Model*> waves;
 
     bool showObstacleMenu = false;

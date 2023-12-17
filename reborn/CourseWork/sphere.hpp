@@ -17,13 +17,14 @@ public:
 
     std::vector<Mesh> meshes;
 
-    Sphere(glm::mat4& modelMatrix, glm::vec4& modelColor, bool lightingEnable = true)
+    Sphere(glm::mat4& modelMatrix, glm::vec4& modelColor, float& speed, bool lightingEnable = false)
     {
         modelSettings.modelMatrix = modelMatrix;
         modelSettings.color = modelColor;
         modelSettings.lightingEnable = lightingEnable;
-        modelSettings.inviseMode = GL_FRONT;
+        modelSettings.speed = speed;
     };
+    ~Sphere() = default;
 
     void Draw(Shader& shader, float& glTime, Scene& scene);
 
@@ -38,6 +39,7 @@ public:
     std::vector<unsigned int>& getIndices();
     std::vector<Vertex>& getVertices();
     std::vector<Face>& getFaces();
+    float getSpeed();
 
     void toWorld();
 

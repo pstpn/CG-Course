@@ -12,11 +12,14 @@ struct ModelSettings
     glm::vec4 color;
     bool lightingEnable;
     int inviseMode;
+    float speed;
 };
 
 class Model
 {
 public:
+    virtual ~Model() = default;
+
     glm::vec4 maxRoomVert = glm::mat4(1.0f) * (glm::vec4(1, 1, 1, 1) * 20.0f);
     glm::vec4 minRoomVert = glm::mat4(1.0f) * (glm::vec4(-1, -1, -1, 1) * 20.0f);
 
@@ -33,6 +36,7 @@ public:
     virtual std::vector<unsigned int>& getIndices() = 0;
     virtual std::vector<Vertex>& getVertices() = 0;
     virtual std::vector<Face>& getFaces() = 0;
+    virtual float getSpeed() = 0;
 
     virtual void toWorld() = 0;
 };

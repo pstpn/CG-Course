@@ -12,9 +12,9 @@ class Scene
 public:
     ~Scene()
     {
-        for (auto* object : objects)
+        for (Model* object : objects)
             delete object;
-        for (auto* sphere : spheres)
+        for (Model* sphere : spheres)
             delete sphere;
 
         objects.clear();

@@ -24,6 +24,7 @@ public:
         modelSettings.lightingEnable = lightingEnable;
         modelSettings.inviseMode = inviseMode;
     };
+    ~Obstacle() = default;
 
     void Draw(Shader& shader, float& glTime, Scene& scene);
 
@@ -38,6 +39,7 @@ public:
     std::vector<unsigned int>& getIndices();
     std::vector<Vertex>& getVertices();
     std::vector<Face>& getFaces();
+    float getSpeed();
 
     void toWorld();
 };

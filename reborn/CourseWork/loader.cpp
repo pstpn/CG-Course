@@ -38,6 +38,7 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
     Vertex vertex;
     Face face;
     glm::vec3 pos, normal, velocity;
+    float speed = model.getSpeed();
 
     aiFace aiFace;
 
@@ -53,9 +54,9 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
         normal.y = mesh->mNormals[i].y;
         normal.z = mesh->mNormals[i].z;
 
-        velocity.x = mesh->mNormals[i].x / 10000;
-        velocity.y = mesh->mNormals[i].y / 10000;
-        velocity.z = mesh->mNormals[i].z / 10000;
+        velocity.x = mesh->mNormals[i].x / 10000 * speed;
+        velocity.y = mesh->mNormals[i].y / 10000 * speed;
+        velocity.z = mesh->mNormals[i].z / 10000 * speed;
 
         vertex.Position = pos;
         vertex.Normal = normal;

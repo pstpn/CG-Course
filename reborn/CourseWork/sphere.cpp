@@ -64,6 +64,11 @@ std::vector<Face>& Sphere::getFaces()
     return faces;
 }
 
+float Sphere::getSpeed()
+{
+    return modelSettings.speed;
+}
+
 void Sphere::toWorld()
 {
     unsigned int i;
