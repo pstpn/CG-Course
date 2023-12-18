@@ -40,3 +40,14 @@ x64
 assimp
 .vs
 imgui
+
+*.aux
+*.toc
+*.zip
+*.bbl
+*.blg
+*.bcf
+*.xml
+*.gz
+*.log
+svg-inkscape

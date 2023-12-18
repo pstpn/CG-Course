@@ -1,0 +1,115 @@
+<mxfile host="Electron" modified="2023-11-06T10:30:40.210Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/22.0.2 Chrome/114.0.5735.289 Electron/25.8.4 Safari/537.36" etag="tuT0rgmgpqwX0aFK8tRO" version="22.0.2" type="device">
+  <diagram id="C5RBs43oDa-KdzZeNtuy" name="Page-1">
+    <mxGraphModel dx="784" dy="856" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
+        <mxCell id="tvILM32cSgXaZei9h_vB-1" value="Начало" style="shape=mxgraph.flowchart.terminator;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="60" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-2" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-1" target="tvILM32cSgXaZei9h_vB-3" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="270" as="sourcePoint" />
+            <mxPoint x="650" y="220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-3" value="Заполнить буфер кадра &#xa;фоновым значением&#xa; интенсивности или цвета" style="rounded=0;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="160" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-6" value="Заполнить z-буфер &#xa;минимальным значением z" style="rounded=0;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="250" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-7" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-3" target="tvILM32cSgXaZei9h_vB-6" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="130" as="sourcePoint" />
+            <mxPoint x="420" y="170" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-9" value="Преобразовать каждый &#xa;многоугольник в растровую&#xa;форму в произвольном &#xa;порядке." style="shape=process;backgroundOutline=1;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="340" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-10" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-6" target="tvILM32cSgXaZei9h_vB-9" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="240" as="sourcePoint" />
+            <mxPoint x="420" y="280" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-11" value="Цикл по всем пикселям&#xa; в многоугольнике" style="shape=loopLimit;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="460" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-12" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-9" target="tvILM32cSgXaZei9h_vB-11" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="350" as="sourcePoint" />
+            <mxPoint x="420" y="390" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-13" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-11" target="tvILM32cSgXaZei9h_vB-14" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="490" as="sourcePoint" />
+            <mxPoint x="420" y="650" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-14" value="Вычислить глубину &#xa;пикселя z(x, y)" style="shape=process;backgroundOutline=1;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="560" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-15" value="z(x, y) &gt; Zбуфер(x, y)?" style="rhombus;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="650" width="200" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-16" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-14" target="tvILM32cSgXaZei9h_vB-15" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="420" y="590" as="sourcePoint" />
+            <mxPoint x="420" y="640" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-17" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-15" target="tvILM32cSgXaZei9h_vB-19" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="350" y="730" as="sourcePoint" />
+            <mxPoint x="590" y="750" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="590" y="690" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-18" value="Да" style="text;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="550" y="660" width="40" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-19" value="Записать атрибут этого пикселя &#xa;в буфер кадра, &#xa;а глубину в Zбуфер(x, y)" style="rounded=0;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="490" y="730" width="200" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-20" value="" style="endArrow=classic;rounded=0;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-19" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="360" y="680" as="sourcePoint" />
+            <mxPoint x="410" y="850" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="590" y="820" />
+              <mxPoint x="410" y="820" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-21" value="" style="endArrow=classic;rounded=0;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-15" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="340" y="780" as="sourcePoint" />
+            <mxPoint x="410" y="850" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="230" y="690" />
+              <mxPoint x="230" y="820" />
+              <mxPoint x="410" y="820" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-22" value="Конец цикла" style="shape=loopLimit;direction=west;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="850" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-24" value="Конец" style="shape=mxgraph.flowchart.terminator;fontFamily=Times New Roman;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+          <mxGeometry x="310" y="950" width="200" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="tvILM32cSgXaZei9h_vB-25" value="" style="endArrow=none;rounded=0;fontFamily=Times New Roman;endFill=0;strokeWidth=2;fontSize=12;" parent="WIyWlLk6GJQsqaUBKTNV-1" source="tvILM32cSgXaZei9h_vB-22" target="tvILM32cSgXaZei9h_vB-24" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="390" y="940" as="sourcePoint" />
+            <mxPoint x="440" y="890" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

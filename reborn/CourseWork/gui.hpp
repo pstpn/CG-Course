@@ -70,9 +70,8 @@ public:
 
     void RenderObstacleMenu() 
     {
-        ImGui::Text("Меню препятствий");
-
-        ImGui::ColorEdit3("Цвет новой модели", objectColor);
+        ImGui::Text("Цвет новой модели");
+        ImGui::ColorEdit3("", objectColor);
 
         ImGui::Text("Позиция");
         ImGui::SliderFloat("X##Позиция", &objectPosition.x, -8, 8);
@@ -143,15 +142,16 @@ public:
             {
                 scene.updateObjectColor(lastColor, deletedModelIndex);
                 showDeleteMenu = false;
+                deletedModelIndex = 0;
+                prevDeletedModelIndex = -1;
             }
         }
     }
 
     void RenderLightingMenu()
     {
-        ImGui::Text("Меню освещения");
-
-        ImGui::ColorEdit3("Цвет источника", lightingColor);
+        ImGui::Text("Цвет световых волн");
+        ImGui::ColorEdit3("", lightingColor);
 
         ImGui::Text("Позиция");
         ImGui::SliderFloat("X##Позиция", &lightingPosition.x, -100, 100);
@@ -173,8 +173,6 @@ public:
 
     void RenderWaveSourceMenu()
     {
-        ImGui::Text("Меню источника звука");
-
         ImGui::Text("Позиция");
         ImGui::SliderFloat("X##Позиция", &waveSourcePosition.x, -8, 8);
         ImGui::SliderFloat("Y##Позиция", &waveSourcePosition.y, -8, 8);
@@ -204,16 +202,16 @@ public:
             showDeleteMenu = true;
         else if (showDeleteMenu)
         {
-            static int deletedWaveSourceIndex = 0;
+            static int deletedWaveSourceNum = 1;
 
             ImGui::Text("Выберите номер источника звука для удаления:");
             ImGui::SetNextItemWidth(300);
-            ImGui::SliderInt("", &deletedWaveSourceIndex, 0, waves.size() - 1);
+            ImGui::SliderInt("", &deletedWaveSourceNum, 1, waves.size());
 
             if (ImGui::Button("Подтвердить удаление", ImVec2(300, 40)))
-                if (deletedWaveSourceIndex >= 0 && deletedWaveSourceIndex < waves.size())
+                if (deletedWaveSourceNum - 1 >= 0 && deletedWaveSourceNum - 1 < waves.size())
                 {
-                    waves.erase(waves.begin() + deletedWaveSourceIndex);
+                    waves.erase(waves.begin() + deletedWaveSourceNum - 1);
                     showDeleteMenu = false;
                 }
             if (ImGui::Button("Отмена", ImVec2(300, 40)))
