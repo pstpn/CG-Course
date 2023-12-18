@@ -70,7 +70,7 @@ public:
 
     void RenderObstacleMenu() 
     {
-        ImGui::Text("Цвет новой модели");
+        ImGui::Text("Цвет препятствия");
         ImGui::ColorEdit3("", objectColor);
 
         ImGui::Text("Позиция");
@@ -112,13 +112,16 @@ public:
                 showDeleteMenu = true;
         else if (showDeleteMenu)
         {
-            static int deletedModelIndex = 0;
+            static int deletedModelNum = 1;
             static int prevDeletedModelIndex = -1;
+            static int deletedModelIndex = deletedModelNum - 1;
             static glm::vec4 lastColor = scene.getObjectColor(deletedModelIndex);;
 
             ImGui::Text("Выберите препятствие для удаления:");
             ImGui::SetNextItemWidth(300);
-            ImGui::SliderInt("", &deletedModelIndex, 0, modelsCount - 1);
+            ImGui::SliderInt("", &deletedModelNum, 1, modelsCount);
+
+            deletedModelIndex = deletedModelNum - 1;
 
             if (prevDeletedModelIndex != deletedModelIndex)
              {
@@ -134,7 +137,7 @@ public:
                 {
                     scene.removeObject(deletedModelIndex);
                     showDeleteMenu = false;
-                    deletedModelIndex = 0;
+                    deletedModelNum = 1;
                     prevDeletedModelIndex = -1;
                     --modelsCount;
                 }
@@ -142,7 +145,7 @@ public:
             {
                 scene.updateObjectColor(lastColor, deletedModelIndex);
                 showDeleteMenu = false;
-                deletedModelIndex = 0;
+                deletedModelNum = 1;
                 prevDeletedModelIndex = -1;
             }
         }
@@ -150,7 +153,7 @@ public:
 
     void RenderLightingMenu()
     {
-        ImGui::Text("Цвет световых волн");
+        ImGui::Text("Цвет источника света");
         ImGui::ColorEdit3("", lightingColor);
 
         ImGui::Text("Позиция");
@@ -276,7 +279,7 @@ public:
 
 private:
     const char* cubeModel = "models/cube.obj";
-    const char* sphereModel = "models/sphere_scaled.obj";
+    const char* sphereModel = "models/sphere_big.obj";
 
     Scene& scene;
     Loader& modelsLoader;

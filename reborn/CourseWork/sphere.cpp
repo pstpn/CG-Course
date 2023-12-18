@@ -8,6 +8,7 @@ void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
     shader.setVec4("modelColor", modelSettings.color);
     shader.setMat4("model", modelSettings.modelMatrix);
 
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     unsigned int i;
 
     for (i = 0; i < meshes.size(); ++i)
@@ -17,6 +18,7 @@ void Sphere::Draw(Shader& shader, float& glTime, Scene& scene)
         meshes[i].Draw(shader);
         meshes[i].Unbind();
     }
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 void Sphere::setColor(glm::vec4& newColor)

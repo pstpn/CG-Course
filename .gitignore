@@ -50,4 +50,6 @@ imgui
 *.xml
 *.gz
 *.log
+*.bkp
+*.dtmp
 svg-inkscape
