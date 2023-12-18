@@ -80,14 +80,14 @@ public:
         ImGui::SliderFloat("Z##Позиция", &objectPosition.z, -8, 8);
 
         ImGui::Text("Масштаб");
-        ImGui::SliderFloat("X##Масштаб", &objectScale.x, 0.1, 3);
-        ImGui::SliderFloat("Y##Масштаб", &objectScale.y, 0.1, 3);
-        ImGui::SliderFloat("Z##Масштаб", &objectScale.z, 0.1, 3);
+        ImGui::SliderFloat("RX##Масштаб", &objectScale.x, 0.1, 3);
+        ImGui::SliderFloat("RY##Масштаб", &objectScale.y, 0.1, 3);
+        ImGui::SliderFloat("RZ##Масштаб", &objectScale.z, 0.1, 3);
 
         ImGui::Text("Угол поворота (в градусах)");
-        ImGui::SliderAngle("X##Поворот", &objectRotation.x, 0, 360);
-        ImGui::SliderAngle("Y##Поворот", &objectRotation.y, 0, 360);
-        ImGui::SliderAngle("Z##Поворот", &objectRotation.z, 0, 360);
+        ImGui::SliderAngle("SX##Поворот", &objectRotation.x, 0, 360);
+        ImGui::SliderAngle("SY##Поворот", &objectRotation.y, 0, 360);
+        ImGui::SliderAngle("SZ##Поворот", &objectRotation.z, 0, 360);
 
         if (ImGui::Button("Разместить препятствие", ImVec2(300, 40)))
         {
@@ -118,8 +118,8 @@ public:
             static glm::vec4 lastColor = scene.getObjectColor(deletedModelIndex);;
 
             ImGui::Text("Выберите препятствие для удаления:");
-            ImGui::SetNextItemWidth(220);
-            ImGui::SliderInt("Выбранное препятствие", &deletedModelIndex, 0, modelsCount - 1);
+            ImGui::SetNextItemWidth(300);
+            ImGui::SliderInt("", &deletedModelIndex, 0, modelsCount - 1);
 
             if (prevDeletedModelIndex != deletedModelIndex)
              {
@@ -181,7 +181,7 @@ public:
         ImGui::SliderFloat("Z##Позиция", &waveSourcePosition.z, -8, 8);
 
         ImGui::Text("Скорость распространения волны");
-        ImGui::SliderFloat("S##Скорость", &waveSpeed, 0, 100);
+        ImGui::SliderFloat("S##", &waveSpeed, 0, 100);
 
         if (ImGui::Button("Установить источник звуковых волн", ImVec2(300, 40)))
         {
@@ -208,7 +208,7 @@ public:
 
             ImGui::Text("Выберите номер источника звука для удаления:");
             ImGui::SetNextItemWidth(300);
-            ImGui::SliderInt("Выбранный источник", &deletedWaveSourceIndex, 0, waves.size() - 1);
+            ImGui::SliderInt("", &deletedWaveSourceIndex, 0, waves.size() - 1);
 
             if (ImGui::Button("Подтвердить удаление", ImVec2(300, 40)))
                 if (deletedWaveSourceIndex >= 0 && deletedWaveSourceIndex < waves.size())
