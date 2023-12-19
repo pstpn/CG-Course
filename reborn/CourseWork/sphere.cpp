@@ -193,6 +193,8 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
         }
     }
 
+
+
     Vertex* pData = (Vertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
     memcpy(pData, &vertices[0], vertices.size() * sizeof(Vertex));
