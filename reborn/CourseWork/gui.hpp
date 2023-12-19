@@ -192,7 +192,7 @@ public:
 
             glm::vec4 newWaveColor = glm::vec4(waveColor[0], waveColor[1], waveColor[2], 0.1);
 
-            newObject = new Sphere(waveMatrix, newWaveColor, waveSpeed);
+            newObject = new Sphere(waveMatrix, newWaveColor, waveSpeed, false);
             modelsLoader.loadModel(sphereModel, *newObject);
             waves.push_back(newObject);
         }
@@ -279,7 +279,7 @@ public:
 
 private:
     const char* cubeModel = "models/cube.obj";
-    const char* sphereModel = "models/sphere_big.obj";
+    const char* sphereModel = "models/sphere_very_big.obj";
 
     Scene& scene;
     Loader& modelsLoader;

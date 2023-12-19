@@ -54,9 +54,13 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
         normal.y = mesh->mNormals[i].y;
         normal.z = mesh->mNormals[i].z;
 
-        velocity.x = mesh->mNormals[i].x / 10000 * speed;
-        velocity.y = mesh->mNormals[i].y / 10000 * speed;
-        velocity.z = mesh->mNormals[i].z / 10000 * speed;
+        velocity.x = pos.x / 10000 * speed;
+        velocity.y = pos.y / 10000 * speed;
+        velocity.z = pos.z / 10000 * speed;
+
+        //velocity.x = mesh->mNormals[i].x / 10000 * speed;
+        //velocity.y = mesh->mNormals[i].y / 10000 * speed;
+        //velocity.z = mesh->mNormals[i].z / 10000 * speed;
 
         vertex.Position = pos;
         vertex.Normal = normal;
@@ -84,19 +88,10 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
             mesh->mFaces[i + 1].mIndices[2]
         );
 
-        glm::vec3 faceVec1 = glm::vec3(
-            vertices[face.Triangles.second.y].Position.x - vertices[face.Triangles.first.x].Position.x,
-            vertices[face.Triangles.second.y].Position.y - vertices[face.Triangles.first.x].Position.y,
-            vertices[face.Triangles.second.y].Position.z - vertices[face.Triangles.first.x].Position.z
-        );
-
-        glm::vec3 faceVec2 = glm::vec3(
-            vertices[face.Triangles.second.z].Position.x - vertices[face.Triangles.first.x].Position.x,
-            vertices[face.Triangles.second.z].Position.y - vertices[face.Triangles.first.x].Position.y,
-            vertices[face.Triangles.second.z].Position.z - vertices[face.Triangles.first.x].Position.z
-        );
-
-        face.Normal = glm::normalize(glm::cross(faceVec1, faceVec2));
+        face.Normal = glm::normalize((
+            vertices[face.Triangles.first.x].Normal + 
+            vertices[face.Triangles.first.y].Normal +
+            vertices[face.Triangles.first.z].Normal) / 3.0f);
 
         model.pushFace(face);
     }

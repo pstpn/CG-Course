@@ -93,13 +93,12 @@ glm::vec4& Sphere::getColor()
 
 void Sphere::toWorld()
 {
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelSettings.modelMatrix)));
+
     unsigned int i;
 
     for (i = 0; i < vertices.size(); ++i)
         vertices[i].Position = modelSettings.modelMatrix * glm::vec4(vertices[i].Position, 1);
-
-    for (i = 0; i < faces.size(); ++i)
-        faces[i].Normal = modelSettings.modelMatrix * glm::vec4(faces[i].Normal, 1);
 }
 
 bool Sphere::isInsideRoom(glm::vec3& point)
@@ -113,43 +112,10 @@ bool Sphere::isInsideRoom(glm::vec3& point)
         point.z > minRoomVert.z;
 }
 
-bool Sphere::isIntersecting(
-    const glm::vec3& orig,
-    const glm::vec3& dir,
-    const glm::vec3& tri0,
-    const glm::vec3& tri1,
-    const glm::vec3& tri2) 
-{
-    glm::vec3 edge1 = tri1 - tri0;
-    glm::vec3 edge2 = tri2 - tri0;
-
-    glm::vec3 h = glm::cross(dir, edge2);
-    float a = glm::dot(edge1, h);
-
-    if (a > -EPSILON && a < EPSILON)
-        return false;
-
-    float f = 1.0f / a;
-    glm::vec3 s = orig - tri0;
-    float u = f * glm::dot(s, h);
-
-    if (u < 0.0f || u > 1.0f)
-        return false;
-
-    glm::vec3 q = glm::cross(s, edge1);
-    float v = f * glm::dot(dir, q);
-
-    if (v < 0.0f || u + v > 1.0f)
-        return false;
-
-    float t = f * glm::dot(edge2, q);
-
-    return t > EPSILON;
-}
-
 void Sphere::updateVelocity(Scene& scene, float& glTime)
 {
     unsigned int i, j, k;
+    float t = 1;
 
     glm::vec3 curPos, curVel, normal, worldPoint;
 
@@ -191,37 +157,24 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
                 float pointPlane5 = glm::dot(pointToVertex5, objFaces[5].Normal);
 
                 if (pointPlane0 < 0 && pointPlane1 < 0 && pointPlane2 < 0 && pointPlane3 < 0 && pointPlane4 < 0 && pointPlane5 < 0)
-                    for (k = 0; k < 6; ++k)
-                        if (isIntersecting(
-                            curPos,
-                            worldPoint,
-                            objVertices[objFaces[k].Triangles.first.x].Position,
-                            objVertices[objFaces[k].Triangles.first.y].Position,
-                            objVertices[objFaces[k].Triangles.first.z].Position) ||
-                            isIntersecting(
-                                curPos,
-                                worldPoint,
-                                objVertices[objFaces[k].Triangles.second.x].Position,
-                                objVertices[objFaces[k].Triangles.second.y].Position,
-                                objVertices[objFaces[k].Triangles.second.z].Position))
-                        {
-                            normal = glm::normalize(objFaces[k].Normal);
-                            float dotProduct = 2 * glm::dot(curVel, normal);
-                            curVel -= dotProduct * normal;
-                            break;
-                        }
+                {
+                    vertices[i].Position = glm::vec3(INT_MAX);
+                    curVel = glm::vec3(0.0f);
+                    break;
+                }
             }
 
         vertices[i].Velocity = curVel;
-        vertices[i].Position = curPos + curVel * glTime;
+        vertices[i].Position += curVel * glTime;
     }
 
     for (const auto& face : faces)
     {
+        float factor = 3;
         if (
-            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.y].Position) > 0.09 ||
-            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.z].Position) > 0.09 ||
-            glm::distance(vertices[face.Triangles.first.y].Position, vertices[face.Triangles.first.z].Position) > 0.09
+            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.y].Position) > factor ||
+            glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.z].Position) > factor ||
+            glm::distance(vertices[face.Triangles.first.y].Position, vertices[face.Triangles.first.z].Position) > factor
             )
         {
             vertices[face.Triangles.first.x].Position = glm::vec3(INT_MAX);
@@ -229,9 +182,9 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
             vertices[face.Triangles.first.z].Position = glm::vec3(INT_MAX);
         }
         if (
-            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.y].Position) > 0.09 ||
-            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.z].Position) > 0.09 ||
-            glm::distance(vertices[face.Triangles.second.y].Position, vertices[face.Triangles.second.z].Position) > 0.09
+            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.y].Position) > factor ||
+            glm::distance(vertices[face.Triangles.second.x].Position, vertices[face.Triangles.second.z].Position) > factor ||
+            glm::distance(vertices[face.Triangles.second.y].Position, vertices[face.Triangles.second.z].Position) > factor
             )
         {
             vertices[face.Triangles.second.x].Position = glm::vec3(INT_MAX);
@@ -240,7 +193,7 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
         }
     }
 
-    Vertex* pData = (Vertex*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+    Vertex* pData = (Vertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 
     memcpy(pData, &vertices[0], vertices.size() * sizeof(Vertex));
 

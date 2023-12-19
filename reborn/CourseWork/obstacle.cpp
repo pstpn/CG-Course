@@ -89,11 +89,11 @@ glm::vec4& Obstacle::getColor()
 
 void Obstacle::toWorld()
 {
-    unsigned int i;
+    glm::mat3 normalMatrix = glm::transpose(glm::inverse(glm::mat3(modelSettings.modelMatrix)));
 
-    for (i = 0; i < vertices.size(); ++i)
+    for (unsigned int i = 0; i < vertices.size(); ++i)
         vertices[i].Position = modelSettings.modelMatrix * glm::vec4(vertices[i].Position, 1);
 
-    for (i = 0; i < faces.size(); ++i)
-        faces[i].Normal = modelSettings.modelMatrix * glm::vec4(faces[i].Normal, 1);
+    for (unsigned int i = 0; i < faces.size(); ++i)
+        faces[i].Normal = glm::normalize(normalMatrix * faces[i].Normal);
 }
