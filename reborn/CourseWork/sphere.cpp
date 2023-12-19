@@ -114,10 +114,9 @@ bool Sphere::isInsideRoom(glm::vec3& point)
 
 void Sphere::updateVelocity(Scene& scene, float& glTime)
 {
-    unsigned int i, j, k;
-    float t = 1;
+    unsigned int i, j;
 
-    glm::vec3 curPos, curVel, normal, worldPoint;
+    glm::vec3 curPos, curVel, worldPoint;
 
     std::vector<Model*> sceneObjects = scene.getObjects();
 
@@ -170,7 +169,7 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
 
     for (const auto& face : faces)
     {
-        float factor = 3;
+        float factor = 1.7;
         if (
             glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.y].Position) > factor ||
             glm::distance(vertices[face.Triangles.first.x].Position, vertices[face.Triangles.first.z].Position) > factor ||
@@ -193,7 +192,7 @@ void Sphere::updateVelocity(Scene& scene, float& glTime)
         }
     }
 
-
+    modelSettings.color.w /= pow(1.01, modelSettings.speed / 1000);
 
     Vertex* pData = (Vertex*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
 

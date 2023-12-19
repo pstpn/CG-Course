@@ -2,6 +2,7 @@
 #include "model.hpp"
 #include "sphere.hpp"
 
+const float EPS = 9.5*1e-2;
 
 void Scene::addObject(Model& obj)
 {
@@ -17,6 +18,12 @@ void Scene::removeObject(int index)
 {
     if (index >= 0 && index < objects.size())
         objects.erase(objects.begin() + index);
+}
+
+void Scene::removeSphere(int index)
+{
+    if (index >= 0 && index < spheres.size())
+        spheres.erase(spheres.begin() + index);
 }
 
 std::vector<Model*>& Scene::getObjects()
@@ -49,6 +56,12 @@ void Scene::render(Shader& shaders, float& glTime)
     for (auto& obj : objects)
         obj->Draw(shaders, glTime, *this);
 
-    for (auto& sphere : spheres)
-        sphere->Draw(shaders, glTime, *this);
+    for (unsigned int i = 0; i < spheres.size(); ++i)
+        if (spheres[i]->getColor().w < EPS)
+        {
+            removeSphere(i--);
+            std::cout << spheres.size() << std::endl;
+        }
+        else
+            spheres[i]->Draw(shaders, glTime, *this);
 }

@@ -24,6 +24,7 @@ public:
     void addObject(Model& obj);
     void addObject(Model* obj);
     void removeObject(int index);
+    void removeSphere(int index);
     std::vector<Model*>& getObjects();
 
     void updateObjectColor(glm::vec4& newColor, int& modelIndex);

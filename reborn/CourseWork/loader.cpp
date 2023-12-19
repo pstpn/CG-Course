@@ -54,9 +54,9 @@ Mesh Loader::processMesh(aiMesh* mesh, const aiScene* scene, Model& model)
         normal.y = mesh->mNormals[i].y;
         normal.z = mesh->mNormals[i].z;
 
-        velocity.x = pos.x / 10000 * speed;
-        velocity.y = pos.y / 10000 * speed;
-        velocity.z = pos.z / 10000 * speed;
+        velocity.x = pos.x / 700 * speed;
+        velocity.y = pos.y / 700 * speed;
+        velocity.z = pos.z / 700 * speed;
 
         //velocity.x = mesh->mNormals[i].x / 10000 * speed;
         //velocity.y = mesh->mNormals[i].y / 10000 * speed;

@@ -182,7 +182,7 @@ public:
         ImGui::SliderFloat("Z##Позиция", &waveSourcePosition.z, -8, 8);
 
         ImGui::Text("Скорость распространения волны");
-        ImGui::SliderFloat("S##", &waveSpeed, 0, 100);
+        ImGui::SliderFloat("S##", &waveSpeed, 1, 25);
 
         if (ImGui::Button("Установить источник звуковых волн", ImVec2(300, 40)))
         {
